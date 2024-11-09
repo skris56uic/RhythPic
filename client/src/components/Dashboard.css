@@ -14,27 +14,80 @@
 .playlists {
 	height: 100%;
 	width: 75vw;
+
+	overflow: hidden;
 }
 
 .songlist {
 	display: flex;
-	justify-content: center;
-	align-items: center;
+	justify-content: left;
 
 	gap: 10px;
 
 	width: 100%;
 }
 
-.queuedsongs {
-	height: 100%;
-	width: 25vw;
-}
-
-.songlist {
+.songtile {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 
-	width: 100%;
+	min-width: 170px;
+	max-width: 170px;
+	min-height: 170px;
+	max-height: 170px;
+
+	background-color: var(--grey);
+	border-radius: 10px;
+
+	transition: background-color 0.2s;
+}
+
+.queuedsongs {
+	height: 100%;
+	width: 25vw;
+
+	background-color: var(--grey);
+}
+
+.queueListitem {
+	display: flex;
+	align-items: left;
+
+	background-color: var(--grey);
+
+	transition: background-color 0.2s;
+
+	text-decoration: none;
+	color: var(--white);
+
+	border: 1px solid var(--black);
+}
+
+.songdetails {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: left;
+
+	padding: 10px;
+}
+
+.tileicon {
+	height: 60px;
+	width: 60px;
+
+	color: var(--purple);
+}
+
+.playicon {
+	height: 45px;
+	width: 45px;
+
+	padding: 10px;
+	color: var(--white);
+}
+
+.title {
+	padding-left: 25px;
 }
