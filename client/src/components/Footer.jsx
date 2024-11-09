@@ -81,7 +81,7 @@ export default function Footer() {
 			<input
 				className="slider"
 				type="range"
-				min="1"
+				min="0"
 				max="100"
 				value={progress}
 				onInput={changeProgress}
