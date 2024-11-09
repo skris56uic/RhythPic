@@ -1,0 +1,147 @@
+.footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	height: var(--footerheight);
+	width: 100%;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+
+	background-color: var(--grey);
+}
+
+.progress {
+	background-color: var(--grey);
+	height: 100%;
+	width: 100%;
+}
+
+.progressbar {
+	height: 3px;
+
+	background-color: var(--purple);
+}
+
+.allcontrols {
+	width: 100%;
+
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	padding-top: 7.5px;
+	padding-bottom: 12.5px;
+}
+
+.mediacontrols {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	gap: 15px;
+}
+
+.volumecontrols {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	gap: 5px;
+}
+
+.footericon {
+	height: 32px;
+	width: 32px;
+
+	transition: 0.33s;
+	cursor: pointer;
+}
+
+.footericon:hover {
+	color: var(--purple);
+}
+
+.footericonsmall {
+	height: 25px;
+	width: 25px;
+
+	transition: 0.33s;
+	cursor: pointer;
+}
+
+.footericonsmall:hover {
+	color: var(--purple);
+}
+
+.slider {
+	-webkit-appearance: none;
+	appearance: none;
+
+	width: 100%;
+	height: 3px;
+
+	outline: none;
+
+	border-radius: 15px;
+}
+
+.slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+
+	width: 15px;
+	height: 15px;
+
+	border: 0px;
+	border-radius: 15px;
+
+	background-color: var(--purple);
+
+	cursor: pointer;
+
+	transition: 0.2s ease-in-out;
+}
+
+.slider::-moz-range-thumb {
+	width: 15px;
+	height: 15px;
+
+	border: 0px;
+	border-radius: 15px;
+
+	background-color: var(--purple);
+
+	cursor: pointer;
+
+	transition: 0.2s ease-in-out;
+}
+
+.slider::-webkit-slider-thumb:hover {
+	box-shadow: 0 0 0 10px rgba(187, 107, 252, 0.1);
+}
+.slider:active::-webkit-slider-thumb {
+	box-shadow: 0 0 0 13px rgba(187, 107, 252, 0.2);
+}
+.slider:focus::-webkit-slider-thumb {
+	box-shadow: 0 0 0 13px rgba(187, 107, 252, 0.2);
+}
+
+.slider::-moz-range-thumb:hover {
+	box-shadow: 0 0 0 10px rgba(187, 107, 252, 0.1);
+}
+.slider:active::-moz-range-thumb {
+	box-shadow: 0 0 0 13px rgba(187, 107, 252, 0.2);
+}
+.slider:focus::-moz-range-thumb {
+	box-shadow: 0 0 0 13px rgba(187, 107, 252, 0.2);
+}
+
+.mediaplayer {
+	display: block;
+
+	height: 40px;
+	width: 100px;
+}

@@ -1,0 +1,58 @@
+.mainpanel {
+	height: 100%;
+
+	display: flex;
+	justify-content: space-between;
+
+	background-color: var(--black);
+	transition: 0.33s;
+}
+
+.sidebarbuttons {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+
+	height: 100%;
+
+	padding-right: 10px;
+	padding-left: 10px;
+
+	background-color: var(--transparent);
+}
+
+.sidebarbutton {
+	height: 70px;
+	width: 70px;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	background-color: var(--grey);
+	color: var(--white);
+
+	border: 0px solid;
+	border-radius: 15px;
+	cursor: pointer;
+}
+
+.sidebarbutton:hover {
+	background-color: var(--purple);
+	color: var(--black);
+	transition: 0.33s;
+}
+
+.sidebaricon {
+	height: 32px;
+	width: 32px;
+}
+
+.generatedimage {
+	height: 100%;
+	width: 100%;
+
+	object-fit: cover;
+}
