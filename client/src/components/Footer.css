@@ -50,6 +50,8 @@
 	align-items: center;
 
 	gap: 5px;
+
+	padding-right: 25px;
 }
 
 .footericon {
@@ -144,4 +146,41 @@
 
 	height: 40px;
 	width: 100px;
+}
+
+.songinfo {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	padding-left: 15px;
+	padding-right: 15px;
+
+	color: var(--white);
+
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.albumcover {
+	height: 40px;
+	width: 40px;
+
+	border-radius: 10px;
+
+	padding-left: 15px;
+	padding-right: 10px;
+}
+
+.songdetails {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: left;
+
+	padding-left: 5px;
+}
+
+.artists {
+	font-size: 0.8rem;
 }

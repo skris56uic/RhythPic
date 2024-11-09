@@ -2,9 +2,9 @@
 	height: 100%;
 
 	display: flex;
-	justify-content: space-between;
+	justify-content: right;
 
-	background-color: var(--black);
+	background-color: var(--transparent);
 	transition: 0.33s;
 }
 
@@ -16,6 +16,7 @@
 
 	height: 100%;
 
+	padding-top: 10px;
 	padding-right: 10px;
 	padding-left: 10px;
 
@@ -51,8 +52,17 @@
 }
 
 .generatedimage {
-	height: 100%;
-	width: 100%;
+	position: fixed;
 
+	top: calc(var(--navbarheight) + 20px);
+	left: 0px;
+
+	height: calc(100vh - (var(--footerheight) + var(--navbarheight) + 0px));
+	width: calc(125vw - 40px);
+
+	z-index: -1;
 	object-fit: cover;
+
+	border: 0px solid;
+	border-radius: 20px;
 }

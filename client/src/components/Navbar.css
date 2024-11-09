@@ -18,15 +18,38 @@
 	padding-right: 30px;
 }
 
+.logolink {
+	display: flex;
+	align-items: center;
+
+	text-decoration: none;
+	color: var(--white);
+
+	cursor: pointer;
+}
+
 .logo {
-	font-size: 1.75rem;
+	height: 50px;
+	width: 50px;
+
+	padding-left: 15px;
+	padding-right: 15px;
+
+	margin: 0px;
+	padding-left: 15px;
+}
+
+.logotext {
+	font-size: 2rem;
 	font-weight: bold;
 
 	padding-left: 15px;
 	padding-right: 15px;
 
 	margin: 0px;
-	cursor: pointer;
+	padding: 0px;
+
+	color: var(--white);
 }
 
 .nav-links {

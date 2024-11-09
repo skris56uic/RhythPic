@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import "./Navbar.css";
+import logo from "../assets/logo/RHYTHPIC_LOGO_SMALL.png";
 
 function Navbar() {
 	const [inputValue, setInputValue] = useState("");
@@ -11,9 +13,10 @@ function Navbar() {
 
 	return (
 		<nav className="navbar">
-			<a to="/">
-				<h2 className="logo">RhythPic</h2>
-			</a>
+			<Link to="/" className="logolink">
+				<img className="logo" src={logo} alt={"RhythPic logo"}></img>
+				<h2 className="logotext">RhythPic</h2>
+			</Link>
 			<div className="searchandicon">
 				<svg
 					className="searchicon"

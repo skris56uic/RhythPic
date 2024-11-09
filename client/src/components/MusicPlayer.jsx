@@ -3,7 +3,7 @@ import { useState } from "react";
 import SidePanel from "./SidePanel";
 import MainPanel from "./MainPanel";
 
-import "./Home.css";
+import "./MusicPlayer.css";
 
 export default function Home() {
 	const [sidepanelstate, setsidepanelstate] = useState("closed");
@@ -29,7 +29,7 @@ export default function Home() {
 	}
 
 	return (
-		<div className="home">
+		<div className="musicplayer">
 			<MainPanel
 				width={sidepanelstate === "closed" ? 100 : 75}
 				opencloselyricspanel={opencloselyricspanel}

@@ -1,4 +1,4 @@
-.home {
+.musicplayer {
 	display: flex;
 
 	padding-top: calc(var(--navbarheight) + 30px);

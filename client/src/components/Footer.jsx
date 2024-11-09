@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import starboysong from "../assets/STARBOY.mp3";
+import starboyImage_1 from "../assets/STARBOY_01.jpeg";
+
 import "./footer.css";
 
 export default function Footer() {
@@ -90,7 +93,19 @@ export default function Footer() {
 				}}
 			/>
 			<div className="allcontrols">
-				<div className="songinfo">{currentLyric || "Song info"}</div>
+				<Link to="/musicplayer" className="songinfo">
+					<img
+						className="albumcover"
+						src={starboyImage_1}
+						alt={"Album Cover"}
+					></img>
+					<div className="songdetails">
+						<span className="songname">Starboy</span>
+						<span className="artists">
+							Daft Punk and The Weeknd
+						</span>
+					</div>
+				</Link>
 				<div className="mediacontrols">
 					<svg
 						className="footericonsmall"

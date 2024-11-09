@@ -1,0 +1,40 @@
+.dashboard {
+	display: flex;
+
+	padding-top: calc(var(--navbarheight) + 30px);
+	padding-bottom: calc(var(--footerheight) + 0px);
+	padding-left: 15px;
+
+	height: calc(100vh - (var(--footerheight) + var(--navbarheight) + 30px));
+	width: 125vw;
+
+	overflow-x: hidden;
+}
+
+.playlists {
+	height: 100%;
+	width: 75vw;
+}
+
+.songlist {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	gap: 10px;
+
+	width: 100%;
+}
+
+.queuedsongs {
+	height: 100%;
+	width: 25vw;
+}
+
+.songlist {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	width: 100%;
+}

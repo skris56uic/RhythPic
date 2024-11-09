@@ -17,6 +17,7 @@ export default function MainPanel({
 				className="generatedimage"
 				src={starboyImage_1}
 				alt="Starboy"
+				style={{ width: `${width}vw` }}
 			/>
 			<div className="sidebarbuttons">
 				<div className="sidebarbutton" onClick={opencloselyricspanel}>
