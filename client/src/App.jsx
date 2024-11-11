@@ -18,6 +18,17 @@ function App() {
     try {
       setLoading(true);
       setError(null);
+
+      const metadataResponse = await fetch("http://localhost:3000/songs");
+      const metadataData = await metadataResponse.json();
+      const songMetadata = metadataData.songs.find(
+        (song) => song.id === songId
+      );
+
+      if (!songMetadata) {
+        throw new Error("Song metadata not found");
+      }
+
       // First, fetch the lyrics and generated images
       const lyricsResponse = await fetch(
         `http://localhost:3000/lycris?id=${songId}`
@@ -25,7 +36,14 @@ function App() {
       if (!lyricsResponse.ok) {
         throw new Error("Failed to fetch song data");
       }
-      const completeData = await lyricsResponse.json();
+      const lyricsData = await lyricsResponse.json();
+
+      const completeData = {
+        ...lyricsData,
+        name: songMetadata.name,
+        artist: songMetadata.artist,
+      };
+      console.log(completeData);
       // Set up audio
       audioRef.current.src = `http://localhost:3000/audio?id=${songId}`;
       audioRef.current.load();

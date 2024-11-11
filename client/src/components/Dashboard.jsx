@@ -2,48 +2,48 @@
 import { Link } from "react-router-dom";
 
 import "./Dashboard.css";
-
-const sampleSongs = [
-  {
-    id: "song_id_1", // Replace with actual Spotify track ID
-    name: "Photograph",
-    artist: "Ed Sheeran",
-  },
-  {
-    id: "song_id_2",
-    name: "Back To You",
-    artist: "Selena Gomez",
-  },
-
-  {
-    id: "song_id_3",
-    name: "Starboy",
-    artist: "Daft Punk and The Weeknd",
-  },
-
-  {
-    id: "7G0gBu6nLdhFDPRLc0HdDG",
-    name: "Mine",
-    artist: "Taylor Swift",
-  },
-  // Add more songs as needed
-];
+import { useEffect, useState } from "react";
 
 export default function Dashboard({ fetchSongData, loading, error }) {
+  const [songs, setSongs] = useState([]);
+  const [loadingSongs, setLoadingSongs] = useState(true);
+
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/songs");
+        if (!response.ok) {
+          throw new Error("Failed to fetch songs");
+        }
+        const data = await response.json();
+        setSongs(data.songs);
+      } catch (error) {
+        console.error("Error fetching songs:", error);
+      } finally {
+        setLoadingSongs(false);
+      }
+    };
+
+    fetchSongs();
+  }, []);
+
   const handleSongClick = async (songId) => {
-    await fetchSongData(songId);
+    const song = songs.find((s) => s.id === songId);
+    if (song) {
+      await fetchSongData(songId);
+    }
   };
 
   return (
     <div className="dashboard">
       <div className="playlists">
         <h2>Recently Played</h2>
-        {/* {loading && <div className="loading">Loading songs...</div>} */}
+        {loading && <div className="loading">Loading songs...</div>}
 
-        {/* {error && <div className="error">Error: {error}</div>} */}
+        {error && <div className="error">Error: {error}</div>}
         <div className="songlist">
           <div className="songtile">Song</div>
-          {sampleSongs.map((song) => (
+          {songs.map((song) => (
             <Link
               to="/musicplayer"
               key={song.id}

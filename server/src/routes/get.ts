@@ -2,15 +2,34 @@ import express, { Router } from "express";
 import { ImageResponse, Song } from "./interfaces";
 import { SongDetails, SongDetailsModel, SongFactModel } from "../models/songs";
 import path from "path";
-import fs from 'fs';
+import fs from "fs";
 
 const router: Router = express.Router();
 
-// Function to get song metadata from JSON file
-const getSongMetadata = (id: string): { name: string; artist: string } | null => {
+router.get("/songs", (req, res) => {
   try {
-    const metadataPath = path.join(__dirname, "../../assets/songs-metadata.json");
-    const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
+    const metadataPath = path.join(
+      __dirname,
+      "../../assets/songs-metadata.json"
+    );
+    const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+    res.json(metadata);
+  } catch (error) {
+    console.error("Error reading metadata:", error);
+    res.status(500).send("Error fetching songs list");
+  }
+});
+
+// Function to get song metadata from JSON file
+const getSongMetadata = (
+  id: string
+): { name: string; artist: string } | null => {
+  try {
+    const metadataPath = path.join(
+      __dirname,
+      "../../assets/songs-metadata.json"
+    );
+    const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
     const song = metadata.songs.find((s: { id: string }) => s.id === id);
     return song ? { name: song.name, artist: song.artist } : null;
   } catch (error) {
@@ -120,38 +139,45 @@ router.get("/songFact", async (req, res) => {
     }
 
     // Step 1: Search for the song on Genius
-    const searchQuery = `${metadata.name} ${metadata.artist}`.replace(/\s+/g, '%20');
+    const searchQuery = `${metadata.name} ${metadata.artist}`.replace(
+      /\s+/g,
+      "%20"
+    );
     const searchResponse = await fetch(
       `https://api.genius.com/search?q=${searchQuery}`,
       {
         headers: {
-          'Authorization': 'Bearer uDzHnl9XbuxOTAjQSn_NEip0coYscD8j27ByVGbW4iEWE3SXSqXSnVSGVR3uOSUw'
-        }
+          Authorization:
+            "Bearer uDzHnl9XbuxOTAjQSn_NEip0coYscD8j27ByVGbW4iEWE3SXSqXSnVSGVR3uOSUw",
+        },
       }
     );
 
     const searchData = await searchResponse.json();
-    
+
     if (!searchData.response.hits.length) {
       res.status(404).send("Song not found on Genius");
       return;
     }
 
     // Extract the Genius song ID from the first hit
-    const geniusId = searchData.response.hits[0].result.api_path.split('/').pop();
+    const geniusId = searchData.response.hits[0].result.api_path
+      .split("/")
+      .pop();
 
     // Step 2: Get song details including description
     const detailsResponse = await fetch(
       `https://api.genius.com/songs/${geniusId}?text_format=plain`,
       {
         headers: {
-          'Authorization': 'Bearer uDzHnl9XbuxOTAjQSn_NEip0coYscD8j27ByVGbW4iEWE3SXSqXSnVSGVR3uOSUw'
-        }
+          Authorization:
+            "Bearer uDzHnl9XbuxOTAjQSn_NEip0coYscD8j27ByVGbW4iEWE3SXSqXSnVSGVR3uOSUw",
+        },
       }
     );
 
     const detailsData = await detailsResponse.json();
-    
+
     if (!detailsData.response.song.description?.plain) {
       res.status(404).send("No song description found");
       return;
@@ -161,11 +187,10 @@ router.get("/songFact", async (req, res) => {
     const songFact = await SongFactModel.create({
       songId,
       geniusId,
-      description: detailsData.response.song.description.plain
+      description: detailsData.response.song.description.plain,
     });
-    
-    res.json({ description: songFact.description });
 
+    res.json({ description: songFact.description });
   } catch (error) {
     console.error("Error fetching song fact:", error);
     res.status(500).send("Error fetching song fact");
