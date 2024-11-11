@@ -13,6 +13,7 @@ function App() {
   const [error, setError] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(new Audio());
+  const [songProgress, setSongProgress] = useState()
 
   const fetchSongData = async (songId) => {
     try {
@@ -91,6 +92,7 @@ function App() {
                 audioRef={audioRef}
                 isPlaying={isPlaying}
                 togglePlayPause={togglePlayPause}
+				songProgress={songProgress}
               />
             }
           />
@@ -100,6 +102,7 @@ function App() {
           audioRef={audioRef}
           isPlaying={isPlaying}
           togglePlayPause={togglePlayPause}
+		  setSongProgress={setSongProgress}
         />
       </div>
     </BrowserRouter>

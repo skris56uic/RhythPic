@@ -1,7 +1,11 @@
 /* eslint-disable react/prop-types */
 import "./SidePanel.css";
 
-export default function SidePanel({ width, sidepanelstate, songData }) {
+export default function SidePanel({ width, sidepanelstate, songData, songProgress}) {
+	const convertTimeTagToSeconds = (timeTag) => {
+		const [minutes, seconds] = timeTag.split(':').map(parseFloat);
+		return minutes * 60 + seconds;
+	  };
   return (
     <div className="sidepanel" style={{ width: `${width}vw` }}>
       {sidepanelstate === "lyrics" && songData && (
@@ -10,7 +14,7 @@ export default function SidePanel({ width, sidepanelstate, songData }) {
           <div className="lyrics-list">
             {songData.isong.lines.map((line, index) => (
               <div key={index} className="lyric-line">
-                {line.words !== " " && (
+                {line.words !== " " && convertTimeTagToSeconds(line.timeTag) < songProgress && (
                   <>
                     <p className="words">{line.words}</p>
                   </>

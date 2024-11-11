@@ -9,6 +9,7 @@ export default function Footer({
   audioRef,
   isPlaying,
   togglePlayPause,
+  setSongProgress,
 }) {
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(100);
@@ -20,7 +21,7 @@ export default function Footer({
       const currentTime = audio.currentTime;
       const duration = audio.duration;
       setProgress((currentTime / duration) * 100 || 0);
-
+	  setSongProgress((currentTime))
       // Update current lyric
       if (songData?.isong?.lines) {
         const currentLine = songData.isong.lines
@@ -52,6 +53,7 @@ export default function Footer({
     const time = (value / 100) * audioRef.current.duration;
     audioRef.current.currentTime = time;
     setProgress(value);
+	setSongProgress(audioRef.current)
   };
 
   return (

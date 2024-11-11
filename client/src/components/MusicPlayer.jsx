@@ -4,7 +4,7 @@ import SidePanel from "./SidePanel";
 import MainPanel from "./MainPanel";
 import "./MusicPlayer.css";
 
-export default function MusicPlayer({ songData }) {
+export default function MusicPlayer({ songData , songProgress}) {
   const [sidepanelstate, setsidepanelstate] = useState("closed");
 
   function opencloselyricspanel() {
@@ -39,6 +39,7 @@ export default function MusicPlayer({ songData }) {
         width={25}
         sidepanelstate={sidepanelstate}
         songData={songData}
+		songProgress={songProgress}
       />
     </div>
   );
