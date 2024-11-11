@@ -1,7 +1,8 @@
 .sidepanel {
   display: flex;
-
   height: 100%;
+  background-color: #0a0a0a;
+  position: relative;
 }
 
 .sidepaneltile {
@@ -13,7 +14,6 @@
   margin: 10px;
   margin-top: 0px;
   margin-left: 0px;
-
   border: 0px solid var(--black);
   border-top: 0px;
   border-left: 0px;
@@ -21,27 +21,64 @@
   background-color: var(--grey);
 }
 
-.lyrics-container {
-  padding: 20px;
-  height: 100%;
+.lyrics-container,
+.trivia-container {
+  padding: 0;
+  height: calc(100% - 80px);
   overflow-y: auto;
+  scroll-behavior: smooth;
+  position: relative;
+  background-color: #0a0a0a;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.lyrics-container h2 {
-  margin-bottom: 20px;
+.lyrics-container h2,
+.trivia-container h2 {
   color: #fff;
+  position: sticky;
+  top: 0;
+  background-color: #0a0a0a;
+  margin: 0;
+  padding: 20px;
+  z-index: 10;
+  width: 100%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: normal;
 }
 
 .lyrics-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  padding: 20px;
+  margin-bottom: 80px;
+  position: relative;
+  z-index: 1;
+  flex: 1;
 }
 
 .lyric-line {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  transition: all 0.3s ease;
+  opacity: 0.6;
+  padding: 0 20px;
+}
+
+.lyric-line.active {
+  opacity: 1;
+  transform: scale(1.05);
 }
 
 .timestamp {
@@ -52,4 +89,16 @@
 .words {
   color: #fff;
   font-size: 1.1em;
+  transition: all 0.3s ease;
+}
+
+.words.active {
+  color: #bb6bfc;
+  font-weight: 500;
+}
+
+.trivia-content {
+  padding: 20px;
+  margin-bottom: 80px;
+  color: #fff;
 }
