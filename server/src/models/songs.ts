@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, set } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
 interface ILine {
   timeTag: string;
@@ -16,6 +16,12 @@ interface SongDetails {
   artist: string;
   isong: ISong;
   fileName: string;
+}
+
+interface SongFact {
+  songId: string;
+  geniusId: string;
+  description: string;
 }
 
 const LineSchema: Schema = new Schema({
@@ -40,9 +46,20 @@ const SongDetailsSchema: Schema = new Schema({
   fileName: { type: String, required: true },
 });
 
-const SongDetailsModel = mongoose.model<SongDetails>(
-  "Songs",
-  SongDetailsSchema
-);
+const SongFactSchema: Schema = new Schema({
+  songId: { type: String, required: true, unique: true },
+  geniusId: { type: String, required: true },
+  description: { type: String, required: true },
+});
 
-export { SongDetailsModel, ILine, ISong, SongDetailsSchema, SongDetails };
+const SongDetailsModel = mongoose.model<SongDetails>("Songs", SongDetailsSchema);
+const SongFactModel = mongoose.model<SongFact>("SongFacts", SongFactSchema);
+
+export { 
+  SongDetailsModel, 
+  SongFactModel,
+  ILine, 
+  ISong, 
+  SongDetails,
+  SongFact 
+};
