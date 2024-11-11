@@ -1,116 +1,89 @@
-import { useState, useRef, useEffect } from "react";
+/* eslint-disable react/prop-types */
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import starboysong from "../assets/STARBOY.mp3";
 import starboyImage_1 from "../assets/STARBOY_01.jpeg";
 import "./footer.css";
 
-export default function Footer() {
+export default function Footer({
+  songData,
+  audioRef,
+  isPlaying,
+  togglePlayPause,
+}) {
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(100);
-  const [play, setPlay] = useState(false);
-  const [currentLyric, setCurrentLyric] = useState(""); // State to hold the current lyric
+  const [currentLyric, setCurrentLyric] = useState("");
 
-  const audioRef = useRef(new Audio(starboysong));
-
-  const lyrics = [
-    { time: 0, text: "Ayy" },
-    { time: 5, text: "I am tryna put you in the worst mood, ah" },
-    { time: 8, text: "P1 cleaner than your church shoes, ah" },
-    { time: 11, text: "Milli point two just to hurt you, ah" },
-    { time: 14, text: "All red Lamb just to tease you, ah" },
-    { time: 17, text: "None of these toys on lease too, ah" },
-    { time: 20, text: "Made your whole year in a week too, yah" },
-    { time: 23, text: "Main bitch outta your league too, ah" },
-    { time: 26, text: "Side bitch outta your league too, ah" },
-  ];
-
-  // Function to update the current lyric based on the current time
-  function updateLyric(currentTime) {
-    const lyric = lyrics.filter((lyric) => lyric.time <= currentTime).pop();
-    if (lyric && lyric.text !== currentLyric) setCurrentLyric(lyric.text);
-  }
-
-  // Function to change the volume
-  function changeVolume(e) {
-    setVolume(e.target.value);
-    if (audioRef.current) audioRef.current.volume = volume / 100;
-  }
-
-  // Function to change the progress of the audio
-  function changeProgress(e) {
-    const newProgress = e.target.value;
-    setProgress(newProgress);
-    if (audioRef.current) {
-      audioRef.current.currentTime =
-        (newProgress / 100) * audioRef.current.duration;
-    }
-  }
-
-  // Function to update progress based on the current time of the audio
-  function updateProgress() {
-    setProgress(
-      (audioRef.current.currentTime / audioRef.current.duration) * 100
-    );
-  }
-
-  // Function to toggle play/pause
-  function togglePlayPause() {
-    if (play) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setPlay(!play);
-  }
-
-  // useEffect to add timeupdate event listener and update progress and lyrics
   useEffect(() => {
-    if (audioRef.current) {
-      const updateProgress = () => {
-        const currentTime = audioRef.current.currentTime;
-        setProgress((currentTime / audioRef.current.duration) * 100);
-        updateLyric(currentTime);
-      };
-      audioRef.current.addEventListener("timeupdate", updateProgress);
-      return () =>
-        audioRef.current.removeEventListener("timeupdate", updateProgress);
-    }
-  }, []);
+    const audio = audioRef.current;
+    const handleTimeUpdate = () => {
+      const currentTime = audio.currentTime;
+      const duration = audio.duration;
+      setProgress((currentTime / duration) * 100 || 0);
+
+      // Update current lyric
+      if (songData?.isong?.lines) {
+        const currentLine = songData.isong.lines
+          .filter((line) => {
+            const [min, sec] = line.timeTag.split(":");
+            const lineTime = parseFloat(min) * 60 + parseFloat(sec);
+            return lineTime <= currentTime;
+          })
+          .pop();
+
+        if (currentLine) {
+          setCurrentLyric(currentLine.words);
+        }
+      }
+    };
+
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    return () => audio.removeEventListener("timeupdate", handleTimeUpdate);
+  }, [songData, audioRef]);
+
+  const handleVolumeChange = (e) => {
+    const value = Number(e.target.value);
+    setVolume(value);
+    audioRef.current.volume = value / 100;
+  };
+
+  const handleProgressChange = (e) => {
+    const value = Number(e.target.value);
+    const time = (value / 100) * audioRef.current.duration;
+    audioRef.current.currentTime = time;
+    setProgress(value);
+  };
 
   return (
     <footer className="footer">
-      <audio
-        className="mediaplayer"
-        ref={audioRef}
-        src={starboysong}
-        controls
-      />
       <input
         className="slider"
         type="range"
         min="0"
         max="100"
         value={progress}
-        onInput={changeProgress}
+        onInput={handleProgressChange}
         style={{
           background: `linear-gradient(to right, #bb6bfc ${progress}%, #1e1e1e ${progress}%)`,
         }}
       />
       <div className="allcontrols">
-        <Link to="/musicplayer" className="songinfo">
-          <img
-            className="albumcover"
-            src={starboyImage_1}
-            alt={"Album Cover"}
-          ></img>
-          <div className="songdetails">
-            <span className="songname">Starboy</span>
-            <span className="artists">Daft Punk and The Weeknd</span>
-          </div>
-        </Link>
+        {songData && (
+          <Link to="/musicplayer" className="songinfo">
+            <img
+              className="albumcover"
+              src={starboyImage_1}
+              alt={"Album Cover"}
+            ></img>
+            <div className="songdetails">
+              <span className="songname">{songData.name}</span>
+              <span className="artists">{songData.artist}</span>
+            </div>
+          </Link>
+        )}
 
-        {/* Display the current lyric */}
-        <div className="current-lyric">{currentLyric}</div>
+        {/* Display the current lyric
+        <div className="current-lyric">{currentLyric}</div> */}
 
         <div className="mediacontrols">
           <svg
@@ -152,7 +125,7 @@ export default function Footer() {
           >
             <path d="M9.195 18.44c1.25.714 2.805-.189 2.805-1.629v-2.34l6.945 3.968c1.25.715 2.805-.188 2.805-1.628V8.69c0-1.44-1.555-2.343-2.805-1.628L12 11.029v-2.34c0-1.44-1.555-2.343-2.805-1.628l-7.108 4.061c-1.26.72-1.26 2.536 0 3.256l7.108 4.061Z" />
           </svg>
-          {play ? (
+          {isPlaying ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -218,7 +191,7 @@ export default function Footer() {
             min="1"
             max="100"
             value={volume}
-            onInput={changeVolume}
+            onInput={handleVolumeChange}
             style={{
               background: `linear-gradient(to right, #bb6bfc ${volume}%, #e1e1e1 ${volume}%)`,
             }}

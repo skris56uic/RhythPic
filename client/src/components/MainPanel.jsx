@@ -37,11 +37,6 @@ export default function MainPanel({
     }
   };
 
-  // Find the first line with a non-empty image_base
-  //   const currentImage = songData?.isong?.lines.find(
-  //     (line) => line.image_base !== ""
-  //   );
-
   return (
     <div className="mainpanel" style={{ width: `${width}vw` }}>
       <div className="image-container">

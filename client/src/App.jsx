@@ -1,17 +1,18 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import { useState, useRef } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Dashboard from "./components/Dashboard";
 import MusicPlayer from "./components/MusicPlayer";
 
 import "./App.css";
-import { useState } from "react";
 
 function App() {
   const [songData, setSongData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(new Audio());
 
   const fetchSongData = async (songId) => {
     try {
@@ -24,13 +25,10 @@ function App() {
       if (!lyricsResponse.ok) {
         throw new Error("Failed to fetch song data");
       }
-      const data = await lyricsResponse.json();
-
-      // Create the complete song data object
-      const completeData = {
-        ...data,
-        audioUrl: `http://localhost:3000/audio?id=${songId}`,
-      };
+      const completeData = await lyricsResponse.json();
+      // Set up audio
+      audioRef.current.src = `http://localhost:3000/audio?id=${songId}`;
+      audioRef.current.load();
 
       setSongData(completeData);
     } catch (error) {
@@ -39,6 +37,15 @@ function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const togglePlayPause = () => {
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
   };
 
   return (
@@ -63,11 +70,19 @@ function App() {
                 songData={songData}
                 loading={loading}
                 error={error}
+                audioRef={audioRef}
+                isPlaying={isPlaying}
+                togglePlayPause={togglePlayPause}
               />
             }
           />
         </Routes>
-        <Footer />
+        <Footer
+          songData={songData}
+          audioRef={audioRef}
+          isPlaying={isPlaying}
+          togglePlayPause={togglePlayPause}
+        />
       </div>
     </BrowserRouter>
   );
