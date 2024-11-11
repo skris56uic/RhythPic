@@ -70,7 +70,7 @@ router.get("/lycris", async (req, res) => {
 
 router.get("/audio", (req, res) => {
   const id = req.query.id as string;
-  console.log('id', id);
+  console.log("id", id);
   res.sendFile(path.join(__dirname, "../../assets", `${id}.mp3`));
 });
 

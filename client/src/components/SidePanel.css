@@ -1,22 +1,55 @@
 .sidepanel {
-	display: flex;
+  display: flex;
 
-	height: 100%;
+  height: 100%;
 }
 
 .sidepaneltile {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	width: 100%;
-	margin: 10px;
-	margin-top: 0px;
-	margin-left: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 10px;
+  margin-top: 0px;
+  margin-left: 0px;
 
-	border: 0px solid var(--black);
-	border-top: 0px;
-	border-left: 0px;
-	border-radius: 25px;
-	background-color: var(--grey);
+  border: 0px solid var(--black);
+  border-top: 0px;
+  border-left: 0px;
+  border-radius: 25px;
+  background-color: var(--grey);
+}
+
+.lyrics-container {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.lyrics-container h2 {
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.lyrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.lyric-line {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.timestamp {
+  font-size: 0.8em;
+  color: #888;
+}
+
+.words {
+  color: #fff;
+  font-size: 1.1em;
 }
