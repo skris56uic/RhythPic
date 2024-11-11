@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
 import "./MainPanel.css";
 
 export default function MainPanel({
@@ -7,23 +8,76 @@ export default function MainPanel({
   openclosetriviapanel,
   songData,
 }) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [loadedImages, setLoadedImages] = useState([]);
+
+  useEffect(() => {
+    if (songData?.isong?.lines) {
+      // Find all lines with images
+      const imagesWithIndex = songData.isong.lines
+        .map((line, index) => ({ ...line, index }))
+        .filter((line) => line.image_base && line.image_base !== "");
+
+      setLoadedImages(imagesWithIndex);
+    }
+  }, [songData]);
+
+  const currentImage = loadedImages[currentImageIndex];
+
+  // Optional: Add functions to navigate between images
+  const nextImage = () => {
+    if (currentImageIndex < loadedImages.length - 1) {
+      setCurrentImageIndex((prev) => prev + 1);
+    }
+  };
+
+  const previousImage = () => {
+    if (currentImageIndex > 0) {
+      setCurrentImageIndex((prev) => prev - 1);
+    }
+  };
+
   // Find the first line with a non-empty image_base
-  const currentImage = songData?.isong?.lines.find(
-    (line) => line.image_base !== ""
-  );
+  //   const currentImage = songData?.isong?.lines.find(
+  //     (line) => line.image_base !== ""
+  //   );
 
   return (
     <div className="mainpanel" style={{ width: `${width}vw` }}>
-      {currentImage ? (
-        <img
-          className="generatedimage"
-          src={currentImage.image_base}
-          alt="Generated visualization"
-          style={{ width: `${width}vw` }}
-        />
-      ) : (
-        <div className="no-image-placeholder">No image available</div>
-      )}
+      <div className="image-container">
+        {currentImage ? (
+          <>
+            <img
+              className="generatedimage"
+              src={`data:image/jpeg;base64,${currentImage.image_base}`}
+              alt={`Visualization for: ${currentImage.words}`}
+              style={{ width: `${width}vw` }}
+            />
+            {/* Optional: Add navigation controls */}
+            <div className="image-navigation">
+              <button
+                onClick={previousImage}
+                disabled={currentImageIndex === 0}
+                className="nav-button"
+              >
+                ←
+              </button>
+              <span className="image-count">
+                {currentImageIndex + 1} / {loadedImages.length}
+              </span>
+              <button
+                onClick={nextImage}
+                disabled={currentImageIndex === loadedImages.length - 1}
+                className="nav-button"
+              >
+                →
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="no-image-placeholder">No image available</div>
+        )}
+      </div>
 
       <div className="sidebarbuttons">
         <div className="sidebarbutton" onClick={opencloselyricspanel}>
