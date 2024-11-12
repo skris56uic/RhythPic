@@ -7,9 +7,16 @@ export default function MainPanel({
   opencloselyricspanel,
   openclosetriviapanel,
   songData,
+  songProgress,
+  sidepanelstate,
 }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loadedImages, setLoadedImages] = useState([]);
+
+  const convertTimeTagToSeconds = (timeTag) => {
+    const [minutes, seconds] = timeTag.split(":").map(parseFloat);
+    return minutes * 60 + seconds;
+  };
 
   useEffect(() => {
     if (songData?.isong?.lines) {
@@ -21,6 +28,23 @@ export default function MainPanel({
       setLoadedImages(imagesWithIndex);
     }
   }, [songData]);
+
+  useEffect(() => {
+    if (loadedImages.length > 0 && songProgress) {
+      const newIndex = loadedImages.findIndex((img, index) => {
+        const currentTime = convertTimeTagToSeconds(img.timeTag);
+        const nextTime =
+          index < loadedImages.length - 1
+            ? convertTimeTagToSeconds(loadedImages[index + 1].timeTag)
+            : Infinity;
+        return songProgress >= currentTime && songProgress < nextTime;
+      });
+
+      if (newIndex !== -1) {
+        setCurrentImageIndex(newIndex);
+      }
+    }
+  }, [songProgress, loadedImages]);
 
   const currentImage = loadedImages[currentImageIndex];
 
@@ -75,7 +99,12 @@ export default function MainPanel({
       </div>
 
       <div className="sidebarbuttons">
-        <div className="sidebarbutton" onClick={opencloselyricspanel}>
+        <div
+          className={`sidebarbutton ${
+            sidepanelstate === "lyrics" ? "active" : ""
+          }`}
+          onClick={opencloselyricspanel}
+        >
           <svg
             className="sidebaricon"
             xmlns="http://www.w3.org/2000/svg"
@@ -91,7 +120,12 @@ export default function MainPanel({
           <div>Lyrics</div>
         </div>
 
-        <div className="sidebarbutton" onClick={openclosetriviapanel}>
+        <div
+          className={`sidebarbutton ${
+            sidepanelstate === "trivia" ? "active" : ""
+          }`}
+          onClick={openclosetriviapanel}
+        >
           <svg
             className="sidebaricon"
             xmlns="http://www.w3.org/2000/svg"
