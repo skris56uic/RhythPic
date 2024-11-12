@@ -42,7 +42,6 @@ export default function Dashboard({ fetchSongData, loading, error }) {
 
         {error && <div className="error">Error: {error}</div>}
         <div className="songlist">
-          <div className="songtile">Song</div>
           {songs.map((song) => (
             <Link
               to="/musicplayer"
@@ -56,6 +55,7 @@ export default function Dashboard({ fetchSongData, loading, error }) {
               </div>
             </Link>
           ))}
+          <div className="songtile">Song</div>
           <div className="songtile">
             <svg
               className="tileicon"
