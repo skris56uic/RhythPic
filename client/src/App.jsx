@@ -20,7 +20,7 @@ function App() {
       setLoading(true);
       setError(null);
 
-      const metadataResponse = await fetch("http://localhost:3000/songs");
+      const metadataResponse = await fetch("https://rhythpic.onrender.com/songs");
       const metadataData = await metadataResponse.json();
       const songMetadata = metadataData.songs.find(
         (song) => song.id === songId
@@ -32,7 +32,7 @@ function App() {
 
       // First, fetch the lyrics and generated images
       const lyricsResponse = await fetch(
-        `http://localhost:3000/lycris?id=${songId}`
+        `https://rhythpic.onrender.com/lycris?id=${songId}`
       );
       if (!lyricsResponse.ok) {
         throw new Error("Failed to fetch song data");
@@ -46,7 +46,7 @@ function App() {
       };
       console.log(completeData);
       // Set up audio
-      audioRef.current.src = `http://localhost:3000/audio?id=${songId}`;
+      audioRef.current.src = `https://rhythpic.onrender.com/audio?id=${songId}`;
       audioRef.current.load();
 
       setSongData(completeData);
