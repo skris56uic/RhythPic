@@ -7,9 +7,15 @@ export default function MainPanel({
   opencloselyricspanel,
   openclosetriviapanel,
   songData,
+  songProgress,
 }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loadedImages, setLoadedImages] = useState([]);
+
+  const convertTimeTagToSeconds = (timeTag) => {
+    const [minutes, seconds] = timeTag.split(":").map(parseFloat);
+    return minutes * 60 + seconds;
+  };
 
   useEffect(() => {
     if (songData?.isong?.lines) {
@@ -21,6 +27,23 @@ export default function MainPanel({
       setLoadedImages(imagesWithIndex);
     }
   }, [songData]);
+
+  useEffect(() => {
+    if (loadedImages.length > 0 && songProgress) {
+      const newIndex = loadedImages.findIndex((img, index) => {
+        const currentTime = convertTimeTagToSeconds(img.timeTag);
+        const nextTime =
+          index < loadedImages.length - 1
+            ? convertTimeTagToSeconds(loadedImages[index + 1].timeTag)
+            : Infinity;
+        return songProgress >= currentTime && songProgress < nextTime;
+      });
+
+      if (newIndex !== -1) {
+        setCurrentImageIndex(newIndex);
+      }
+    }
+  }, [songProgress, loadedImages]);
 
   const currentImage = loadedImages[currentImageIndex];
 

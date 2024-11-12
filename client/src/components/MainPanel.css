@@ -1,11 +1,10 @@
 .mainpanel {
   height: 100%;
-
   display: flex;
   justify-content: right;
-
   background-color: var(--transparent);
   transition: 0.33s;
+  position: relative;
 }
 
 .sidebarbuttons {
@@ -13,28 +12,23 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-
   height: 100%;
-
   padding-top: 10px;
   padding-right: 10px;
   padding-left: 10px;
-
   background-color: var(--transparent);
+  z-index: 1;
 }
 
 .sidebarbutton {
   height: 70px;
   width: 70px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   background-color: var(--grey);
   color: var(--white);
-
   border: 0px solid;
   border-radius: 15px;
   cursor: pointer;
@@ -51,28 +45,36 @@
   width: 32px;
 }
 
-.generatedimage {
+.image-container {
   position: fixed;
-
   top: calc(var(--navbarheight) + 20px);
   left: 0px;
-
   height: calc(100vh - (var(--footerheight) + var(--navbarheight) + 0px));
-  width: calc(125vw - 40px);
-
-  z-index: -1;
-  object-fit: cover;
-
-  border: 0px solid;
-  border-radius: 20px;
-
-  transition: 0.33s;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .generatedimage {
-  object-fit: contain;
-  max-height: 100vh;
   width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: 0.33s;
+  border-radius: 20px;
+}
+
+/* Add specific styling for the alt text */
+.generatedimage:not([src]),
+.generatedimage[src=""],
+.generatedimage[src="#"] {
+  font-size: 14px;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 20px;
+  max-width: 100%;
 }
 
 .no-image-placeholder {
@@ -84,4 +86,38 @@
   background-color: #1e1e1e;
   color: #888;
   font-size: 1.2em;
+}
+
+.image-navigation {
+  position: fixed;
+  bottom: calc(var(--footerheight) + 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px 20px;
+  border-radius: 20px;
+  color: white;
+  z-index: 1;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px 15px;
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.image-count {
+  font-size: 14px;
+  margin: 0 10px;
 }
