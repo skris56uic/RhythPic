@@ -17,7 +17,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 // Configure CORS with increased header limits
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://rhythpic-front.onrender.com",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
