@@ -50,63 +50,65 @@ router.get("/lycris", async (req, res) => {
     res.send(song[0]);
     return;
   }
-  try {
-    const response = await fetch(
-      `https://spotify-lyrics-api-pi.vercel.app/?trackid=${id}&format=lrc`,
-      {
-        method: "GET",
-      }
-    );
-    const lrcData: Song = await response.json();
+  res.send("No song found in database");
+  return;
+  // try {
+  //   const response = await fetch(
+  //     `https://spotify-lyrics-api-pi.vercel.app/?trackid=${id}&format=lrc`,
+  //     {
+  //       method: "GET",
+  //     }
+  //   );
+  //   const lrcData: Song = await response.json();
 
-    for (const line of lrcData.lines) {
-      if (line.words.length > 1) {
-        const imgResponse = await fetch(
-          "https://texttoimage-h438.onrender.com/api/v1/imgGenerate",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ prompt: line.words }),
-          }
-        );
-        console.log("images generated for lycris", line.words);
-        const imgData: ImageResponse = await imgResponse.json();
-        lrcData.lines[lrcData.lines.indexOf(line)].image_base = imgData.photo;
-      } else {
-        lrcData.lines[lrcData.lines.indexOf(line)].image_base = "";
-      }
-    }
+  //   for (const line of lrcData.lines) {
+  //     if (line.words.length > 1) {
+  //       const imgResponse = await fetch(
+  //         "https://texttoimage-h438.onrender.com/api/v1/imgGenerate",
+  //         {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify({ prompt: line.words }),
+  //         }
+  //       );
+  //       console.log("images generated for lycris", line.words);
+  //       const imgData: ImageResponse = await imgResponse.json();
+  //       lrcData.lines[lrcData.lines.indexOf(line)].image_base = imgData.photo;
+  //     } else {
+  //       lrcData.lines[lrcData.lines.indexOf(line)].image_base = "";
+  //     }
+  //   }
 
-    // Get metadata from JSON file
-    const metadata = getSongMetadata(id);
-    if (!metadata) {
-      console.log("Metadata not found for id:", id);
-      res.status(404).send("Song metadata not found");
-      return;
-    }
+  // Get metadata from JSON file
+  // const metadata = getSongMetadata(id);
+  // if (!metadata) {
+  //   console.log("Metadata not found for id:", id);
+  //   res.status(404).send("Song metadata not found");
+  //   return;
+  // }
 
-    const newSong: SongDetails = {
-      name: metadata.name,
-      artist: metadata.artist,
-      fileName: id,
-      isong: {
-        id,
-        lines: lrcData.lines.map((l) => ({
-          image_base: l.image_base,
-          timeTag: l.timeTag,
-          words: l.words,
-        })),
-      },
-    };
-    console.log("saving song to db");
-    await SongDetailsModel.insertMany([newSong]);
-    res.send(newSong);
-  } catch (error) {
-    console.log("error", error);
-    res.status(500).send("Error fetching lyrics");
-  }
+  // const newSong: SongDetails = {
+  //   name: metadata.name,
+  //   artist: metadata.artist,
+  //   fileName: id,
+  //   isong: {
+  //     id,
+  //     lines: lrcData.lines.map((l) => ({
+  //       image_base: l.image_base,
+  //       timeTag: l.timeTag,
+  //       words: l.words,
+  //     })),
+  //   },
+  // };
+  // console.log("saving song to db");
+  // await SongDetailsModel.insertMany([newSong]);
+  // res.send(newSong);
+  // } catch (error) {
+  //   console.log("error", error);
+  //   res.status(500).send("Error fetching lyrics");
+  // }
 });
 
 router.get("/audio", (req, res) => {
