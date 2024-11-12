@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import starboyImage_1 from "../assets/STARBOY_01.jpeg";
-import "./footer.css";
+import "./Footer.css";
 
 export default function Footer({
   songData,
