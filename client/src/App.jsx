@@ -97,13 +97,15 @@ function App() {
             }
           />
         </Routes>
-        <Footer
-          songData={songData}
-          audioRef={audioRef}
-          isPlaying={isPlaying}
-          togglePlayPause={togglePlayPause}
-          setSongProgress={setSongProgress}
-        />
+        {songData && (
+          <Footer
+            songData={songData}
+            audioRef={audioRef}
+            isPlaying={isPlaying}
+            togglePlayPause={togglePlayPause}
+            setSongProgress={setSongProgress}
+          />
+        )}
       </div>
     </BrowserRouter>
   );
