@@ -35,6 +35,7 @@ export default function MusicPlayer({ songData, songProgress }) {
         openclosetriviapanel={openclosetriviapanel}
         songData={songData}
         songProgress={songProgress}
+        sidepanelstate={sidepanelstate}
       />
       <SidePanel
         width={25}

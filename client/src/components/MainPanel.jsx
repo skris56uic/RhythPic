@@ -8,6 +8,7 @@ export default function MainPanel({
   openclosetriviapanel,
   songData,
   songProgress,
+  sidepanelstate,
 }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loadedImages, setLoadedImages] = useState([]);
@@ -98,7 +99,12 @@ export default function MainPanel({
       </div>
 
       <div className="sidebarbuttons">
-        <div className="sidebarbutton" onClick={opencloselyricspanel}>
+        <div
+          className={`sidebarbutton ${
+            sidepanelstate === "lyrics" ? "active" : ""
+          }`}
+          onClick={opencloselyricspanel}
+        >
           <svg
             className="sidebaricon"
             xmlns="http://www.w3.org/2000/svg"
@@ -114,7 +120,12 @@ export default function MainPanel({
           <div>Lyrics</div>
         </div>
 
-        <div className="sidebarbutton" onClick={openclosetriviapanel}>
+        <div
+          className={`sidebarbutton ${
+            sidepanelstate === "trivia" ? "active" : ""
+          }`}
+          onClick={openclosetriviapanel}
+        >
           <svg
             className="sidebaricon"
             xmlns="http://www.w3.org/2000/svg"

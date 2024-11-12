@@ -45,6 +45,11 @@
   width: 32px;
 }
 
+.sidebarbutton.active {
+  background-color: var(--purple);
+  color: var(--black);
+}
+
 .image-container {
   position: fixed;
   top: calc(var(--navbarheight) + 20px);
