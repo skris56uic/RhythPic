@@ -11,7 +11,7 @@ export default function Dashboard({ fetchSongData, loading, error }) {
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const response = await fetch("https://rhythpic.onrender.com/songs");
+        const response = await fetch("http://localhost:3000/songs");
         if (!response.ok) {
           throw new Error("Failed to fetch songs");
         }

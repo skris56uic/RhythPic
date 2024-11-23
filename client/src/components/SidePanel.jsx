@@ -47,7 +47,7 @@ export default function SidePanel({
         setError(null);
 
         const response = await fetch(
-          `https://rhythpic.onrender.com/songFact?id=${songData?.fileName}`
+          `http://localhost:3000/songFact?id=${songData?.fileName}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch song fact");
