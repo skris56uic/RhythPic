@@ -37,7 +37,10 @@ export default function MusicPlayer() {
         openclosetriviapanel={openclosetriviapanel}
         sidepanelstate={sidepanelstate}
       />
-      <SidePanel width={25} sidepanelstate={sidepanelstate} />
+      <SidePanel
+        width={sidepanelstate === "closed" ? 0 : 25}
+        sidepanelstate={sidepanelstate}
+      />
     </div>
   );
 }

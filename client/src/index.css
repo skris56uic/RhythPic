@@ -7,8 +7,10 @@
   --white: #e1e1e1;
   --red: #fe251b;
   --transparent: #ff000000;
+  --lightgrey: #343434;
+  --lightblack: #0a0a0a;
 
-  --navbarheight: 50px;
+  --navbarheight: 80px;
   --footerheight: 75px;
 
   overflow: hidden;
@@ -30,4 +32,22 @@ body {
 
   background-color: var(--black);
   color: var(--white);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--grey);
+
+  border-radius: 50px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--lightgrey);
 }

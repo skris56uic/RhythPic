@@ -1,11 +1,9 @@
 .musicplayer {
-	display: flex;
+  display: flex;
 
-	padding-top: calc(var(--navbarheight) + 30px);
-	padding-bottom: calc(var(--footerheight) + 0px);
+  padding-top: calc(var(--navbarheight));
+  padding-bottom: calc(var(--footerheight) + 0px);
 
-	height: calc(100vh - (var(--footerheight) + var(--navbarheight) + 30px));
-	width: 125vw;
-
-	overflow-x: hidden;
+  height: calc(100vh - (var(--footerheight) + var(--navbarheight)));
+  width: 125vw;
 }

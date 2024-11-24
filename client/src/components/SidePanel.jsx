@@ -26,14 +26,12 @@ export default function SidePanel({ width, sidepanelstate }) {
       const container = lyricsContainerRef.current;
       const element = activeLyricRef.current;
 
-      // Calculate the scroll position to center the active lyric
       const containerHeight = container.clientHeight;
       const elementTop = element.offsetTop;
       const elementHeight = element.clientHeight;
       const centerPosition =
         elementTop - containerHeight / 2 + elementHeight / 2;
 
-      // Smooth scroll to the position
       container.scrollTo({
         top: centerPosition,
         behavior: "smooth",
@@ -71,49 +69,53 @@ export default function SidePanel({ width, sidepanelstate }) {
   return (
     <div className="sidepanel" style={{ width: `${width}vw` }}>
       {sidepanelstate === "lyrics" && songData && (
-        <div className="lyrics-container" ref={lyricsContainerRef}>
+        <>
           <h2 className="section-header">Lyrics</h2>
-          <div className="lyrics-list">
-            {songData.isong.lines.map((line, index) => {
-              const isCurrentLyric =
-                convertTimeTagToSeconds(line.timeTag) <= songProgress &&
-                (index === songData.isong.lines.length - 1 ||
-                  convertTimeTagToSeconds(
-                    songData.isong.lines[index + 1].timeTag
-                  ) > songProgress);
+          <div className="lyrics-container" ref={lyricsContainerRef}>
+            <div className="lyrics-list">
+              {songData.isong.lines.map((line, index) => {
+                const isCurrentLyric =
+                  convertTimeTagToSeconds(line.timeTag) <= songProgress &&
+                  (index === songData.isong.lines.length - 1 ||
+                    convertTimeTagToSeconds(
+                      songData.isong.lines[index + 1].timeTag
+                    ) > songProgress);
 
-              return (
-                <div
-                  key={index}
-                  className={`lyric-line ${isCurrentLyric ? "active" : ""}`}
-                  ref={isCurrentLyric ? activeLyricRef : null}
-                >
-                  {line.words !== " " && (
-                    <p className={`words ${isCurrentLyric ? "active" : ""}`}>
-                      {line.words}
-                    </p>
-                  )}
-                </div>
-              );
-            })}
+                return (
+                  <div
+                    key={index}
+                    className={`lyric-line ${isCurrentLyric ? "active" : ""}`}
+                    ref={isCurrentLyric ? activeLyricRef : null}
+                  >
+                    {line.words !== " " && (
+                      <p className={`words ${isCurrentLyric ? "active" : ""}`}>
+                        {line.words}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </>
       )}
       {sidepanelstate === "trivia" && (
-        <div className="trivia-container">
+        <>
           <h2 className="section-header">Trivia</h2>
-          <div className="trivia-content" ref={triviaPanelRef}>
-            {loading && <div>Loading song fact...</div>}
-            {error && <div>Error: {error}</div>}
-            {songFact && (
-              <div className="fact-text">
-                {songFact.split("\n").map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
-                ))}
-              </div>
-            )}
+          <div className="trivia-container">
+            <div className="trivia-content" ref={triviaPanelRef}>
+              {loading && <div>Loading song fact...</div>}
+              {error && <div>Error: {error}</div>}
+              {songFact && (
+                <div className="fact-text">
+                  {songFact.split("\n").map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

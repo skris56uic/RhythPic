@@ -14,6 +14,8 @@ export default function Footer() {
   const [currentLyric, setCurrentLyric] = useState("");
 
   useEffect(() => {
+    console.log(songData);
+
     const audio = audioRef.current;
 
     const handleTimeUpdate = () => {
@@ -21,7 +23,7 @@ export default function Footer() {
       const duration = audio.duration;
       setProgress((currentTime / duration) * 100 || 0);
       setSongProgress(currentTime);
-      // Update current lyric
+
       if (songData?.isong?.lines) {
         const currentLine = songData.isong.lines
           .filter((line) => {
@@ -71,7 +73,11 @@ export default function Footer() {
       <div className="allcontrols">
         {songData && (
           <Link to="/musicplayer" className="songinfo">
-            <img className="albumcover" src alt={"Album Cover"}></img>
+            <img
+              className="albumcover"
+              src={songData.album_art_cover}
+              alt={"Album Cover"}
+            ></img>
             <div className="songdetails">
               <span className="songname">{songData.name}</span>
               <span className="artists">{songData.artist}</span>
