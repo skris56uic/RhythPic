@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useEffect, useState, useContext } from "react";
 
 import { AppContext } from "../AppContextAndAppContextProvider";
@@ -11,8 +10,7 @@ export default function MainPanel({
   openclosetriviapanel,
   sidepanelstate,
 }) {
-  const { songProgress } = useContext(AppContext);
-  const { songData } = useContext(AppContext);
+  const { currentSong, songProgress } = useContext(AppContext);
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loadedImages, setLoadedImages] = useState([]);
@@ -23,15 +21,14 @@ export default function MainPanel({
   };
 
   useEffect(() => {
-    if (songData?.isong?.lines) {
-      // Find all lines with images
-      const imagesWithIndex = songData.isong.lines
+    if (currentSong) {
+      const imagesWithIndex = currentSong.lyricsAndImages
         .map((line, index) => ({ ...line, index }))
         .filter((line) => line.image_base && line.image_base !== "");
 
       setLoadedImages(imagesWithIndex);
     }
-  }, [songData]);
+  }, [currentSong]);
 
   useEffect(() => {
     if (loadedImages.length > 0 && songProgress) {
@@ -52,7 +49,6 @@ export default function MainPanel({
 
   const currentImage = loadedImages[currentImageIndex];
 
-  // Optional: Add functions to navigate between images
   const nextImage = () => {
     if (currentImageIndex < loadedImages.length - 1) {
       setCurrentImageIndex((prev) => prev + 1);
@@ -76,7 +72,7 @@ export default function MainPanel({
               alt={`Visualization for: ${currentImage.words}`}
               style={{ width: `${width}vw` }}
             />
-            {/* Optional: Add navigation controls */}
+
             <div className="image-navigation">
               <button
                 onClick={previousImage}

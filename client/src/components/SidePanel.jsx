@@ -1,20 +1,15 @@
-/* eslint-disable react/prop-types */
-import { useEffect, useRef, useState, useContext } from "react";
+import { useEffect, useRef, useContext } from "react";
 
 import { AppContext } from "../AppContextAndAppContextProvider";
 
 import "./SidePanel.css";
 
 export default function SidePanel({ width, sidepanelstate }) {
-  const { songProgress } = useContext(AppContext);
-  const { songData } = useContext(AppContext);
+  const { allSongs, currentSong, songProgress } = useContext(AppContext);
 
   const lyricsContainerRef = useRef(null);
   const activeLyricRef = useRef(null);
   const triviaPanelRef = useRef(null);
-  const [songFact, setSongFact] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const convertTimeTagToSeconds = (timeTag) => {
     const [minutes, seconds] = timeTag.split(":").map(parseFloat);
@@ -39,46 +34,19 @@ export default function SidePanel({ width, sidepanelstate }) {
     }
   }, [songProgress]);
 
-  useEffect(() => {
-    const fetchSongFact = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const response = await fetch(
-          `http://localhost:3000/songFact?id=${songData?.fileName}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch song fact");
-        }
-        const data = await response.json();
-        setSongFact(data.description);
-      } catch (error) {
-        console.error("Error fetching song fact:", error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (songData?.fileName) {
-      fetchSongFact();
-    }
-  }, [songData?.fileName]);
-
   return (
     <div className="sidepanel" style={{ width: `${width}vw` }}>
-      {sidepanelstate === "lyrics" && songData && (
+      {sidepanelstate === "lyrics" && currentSong && (
         <>
           <h2 className="section-header">Lyrics</h2>
           <div className="lyrics-container" ref={lyricsContainerRef}>
             <div className="lyrics-list">
-              {songData.isong.lines.map((line, index) => {
+              {currentSong.lyricsAndImages.map((line, index) => {
                 const isCurrentLyric =
                   convertTimeTagToSeconds(line.timeTag) <= songProgress &&
-                  (index === songData.isong.lines.length - 1 ||
+                  (index === currentSong.lyricsAndImages.length - 1 ||
                     convertTimeTagToSeconds(
-                      songData.isong.lines[index + 1].timeTag
+                      currentSong.lyricsAndImages[index + 1].timeTag
                     ) > songProgress);
 
                 return (
@@ -104,11 +72,9 @@ export default function SidePanel({ width, sidepanelstate }) {
           <h2 className="section-header">Trivia</h2>
           <div className="trivia-container">
             <div className="trivia-content" ref={triviaPanelRef}>
-              {loading && <div>Loading song fact...</div>}
-              {error && <div>Error: {error}</div>}
-              {songFact && (
+              {currentSong.trivia && (
                 <div className="fact-text">
-                  {songFact.split("\n").map((paragraph, index) => (
+                  {currentSong.trivia.split("\n").map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
                   ))}
                 </div>

@@ -1,32 +1,56 @@
-export async function fetchSongData(songId) {
+const base_url = "http://localhost:3000";
+
+export async function fetchSongLyrics(songId) {
   try {
-    const metadataResponse = await fetch("http://localhost:3000/songs");
-    const metadataData = await metadataResponse.json();
-    const songMetadata = metadataData.songs.find((song) => song.id === songId);
+    const response = await fetch(`${base_url}/lycris?id=${songId}`);
 
-    if (!songMetadata) {
-      throw new Error("Song metadata not found");
+    if (!response.ok) {
+      throw new Error("Failed to Fetch Song Details");
     }
 
-    const lyricsResponse = await fetch(
-      `http://localhost:3000/lycris?id=${songId}`
-    );
-    if (!lyricsResponse.ok) {
-      throw new Error("Failed to fetch song data");
-    }
-    const lyricsData = await lyricsResponse.json();
+    const lyrics = await response.json();
 
-    const completeData = {
-      ...lyricsData,
-      name: songMetadata.name,
-      artist: songMetadata.artist,
-    };
-
-    return completeData;
+    return lyrics;
   } catch (error) {
-    console.error("Error fetching song data:", error);
-    // setError(error.message);
-  } finally {
-    // setLoading(false);
+    console.error("Error Fetching Song Details:", error);
+  }
+}
+
+export async function fetchSongTrivia(fileName) {
+  try {
+    const response = await fetch(`${base_url}/songFact?id=${fileName}`);
+
+    if (!response.ok) {
+      throw new Error("Failed to Fetch Song Details");
+    }
+
+    const trivia = await response.json();
+
+    return trivia;
+  } catch (error) {
+    console.error("Error Fetching Song Details:", error);
+  }
+}
+
+export async function fetchListOfSongs() {
+  try {
+    const response = await fetch(`${base_url}/songs`);
+
+    if (!response.ok) {
+      throw new Error("Failed to Fetch Songs");
+    }
+
+    const allSongs = await response.json();
+
+    allSongs.songs = allSongs.songs.map((song, index) => {
+      return {
+        ...song,
+        index,
+      };
+    });
+
+    return allSongs;
+  } catch (error) {
+    console.error("Error Fetching All Songs:", error);
   }
 }

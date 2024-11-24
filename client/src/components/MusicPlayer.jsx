@@ -1,12 +1,15 @@
-/* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useState, useContext } from "react";
 
 import SidePanel from "./SidePanel";
 import MainPanel from "./MainPanel";
+import { AppContext } from "../AppContextAndAppContextProvider";
 
 import "./MusicPlayer.css";
+import Loader from "./Loader";
 
 export default function MusicPlayer() {
+  const { loading } = useContext(AppContext);
+
   const [sidepanelstate, setsidepanelstate] = useState("closed");
 
   function opencloselyricspanel() {
@@ -29,7 +32,9 @@ export default function MusicPlayer() {
     }
   }
 
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <div className="musicplayer">
       <MainPanel
         width={sidepanelstate === "closed" ? 100 : 75}

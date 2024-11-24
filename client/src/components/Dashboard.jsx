@@ -1,43 +1,22 @@
 import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 
-import { fetchSongData } from "../api/api";
+import { fetchSongLyrics, fetchSongTrivia } from "../api/api";
 import { AppContext } from "../AppContextAndAppContextProvider";
+import Loader from "./Loader";
 
 import "./Dashboard.css";
 
 export default function Dashboard() {
   const {
-    songData,
-    setSongData,
+    allSongs,
+    setAllSongs,
+    currentSong,
+    setCurrentSong,
     loading,
     setLoading,
-    error,
-    setError,
     audioRef,
   } = useContext(AppContext);
-
-  const [songs, setSongs] = useState([]);
-  const [loadingSongs, setLoadingSongs] = useState(true);
-
-  useEffect(() => {
-    const fetchSongs = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/songs");
-        if (!response.ok) {
-          throw new Error("Failed to fetch songs");
-        }
-        const data = await response.json();
-        setSongs(data.songs);
-      } catch (error) {
-        console.error("Error fetching songs:", error);
-      } finally {
-        setLoadingSongs(false);
-      }
-    };
-
-    fetchSongs();
-  }, []);
 
   function generateSongTiles(from = 0, to = 5) {
     const generatedSongTiles = [];
@@ -45,18 +24,18 @@ export default function Dashboard() {
       generatedSongTiles.push(
         <Link
           to="/musicplayer"
-          key={songs[i].id}
+          key={allSongs[i].id}
           className="songtile"
-          onClick={() => handleSongClick(songs[i].id)}
+          onClick={() => handleSongClick(allSongs[i].id)}
         >
           <img
             className="songimages"
-            src={songs[i].album_art_url}
-            alt={`${songs[i].name}\n${songs[i].artist}`}
+            src={allSongs[i].album_art_url}
+            alt={`${allSongs[i].name}\n${allSongs[i].artist}`}
           ></img>
           <div className="songdetails">
-            <span className="songname">{songs[i].name}</span>
-            <span className="artists">{songs[i].artist}</span>
+            <span className="songname">{allSongs[i].name}</span>
+            <span className="artists">{allSongs[i].artist}</span>
           </div>
         </Link>
       );
@@ -67,13 +46,13 @@ export default function Dashboard() {
 
   function geneerateQueueListItems() {
     const queueListItems = [];
-    for (let i = 0; i < songs.length; i++) {
+    for (let i = 0; i < allSongs.length; i++) {
       queueListItems.push(
         <Link
           to="/musicplayer"
-          key={songs[i].id}
+          key={allSongs[i].id}
           className="queueListitem"
-          onClick={() => handleSongClick(songs[i].id)}
+          onClick={() => handleSongClick(allSongs[i].id)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -88,8 +67,8 @@ export default function Dashboard() {
             />
           </svg>
           <div className="songdetails">
-            <span className="songname">{songs[i].name}</span>
-            <span className="artists">{songs[i].artist}</span>
+            <span className="songname">{allSongs[i].name}</span>
+            <span className="artists">{allSongs[i].artist}</span>
           </div>
         </Link>
       );
@@ -99,23 +78,51 @@ export default function Dashboard() {
   }
 
   const handleSongClick = async (songId) => {
-    const song = songs.find((s) => s.id === songId);
-    if (song) {
-      const reply = await fetchSongData(songId);
+    setLoading({ text: "Fetching Song Details ..." });
+
+    if (!allSongs.find((song) => song.id === songId).lyricsAndImages) {
+      //console.log("data not in app, fetching data from server");
+
+      const lyrics = await fetchSongLyrics(songId);
+
+      const trivia = await fetchSongTrivia(lyrics.fileName);
+
+      const newAllSongs = allSongs.map((song) =>
+        song.id === songId
+          ? {
+              ...song,
+              fileName: lyrics.fileName,
+              lyricsAndImages: lyrics.isong.lines,
+              trivia: trivia.description,
+            }
+          : song
+      );
+
+      setAllSongs(newAllSongs);
+
+      setCurrentSong(newAllSongs.find((song) => song.id === songId));
+
       audioRef.current.src = `http://localhost:3000/audio?id=${songId}`;
       audioRef.current.load();
-      setLoading(true);
-      setError(null);
-      setSongData(reply);
+
+      setLoading(null);
+    } else {
+      // console.log("data already in app, no need to fetch from server");
+
+      setCurrentSong(allSongs.find((song) => song.id === songId));
+
+      setLoading(null);
     }
   };
 
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <div
       className="dashboard"
       style={{
         height: `${
-          songData
+          currentSong
             ? "calc(100vh - (var(--footerheight) + var(--navbarheight)))"
             : "calc(100vh - (var(--navbarheight)))"
         }`,
@@ -123,11 +130,9 @@ export default function Dashboard() {
     >
       <div className="playlists">
         <h2>Recently Played</h2>
-        {loading && <div className="loading">Loading songs...</div>}
 
-        {error && <div className="error">Error: {error}</div>}
         <div className="songlist">
-          {songs.length && generateSongTiles(0, 5)}
+          {allSongs.length && generateSongTiles(0, 5)}
           <div className="emptysongtile">
             <svg
               className="tileicon"
@@ -145,7 +150,7 @@ export default function Dashboard() {
         </div>
         <h2>All Songs</h2>
         <div className="songlist">
-          {songs.length && generateSongTiles(5, 10)}
+          {allSongs.length && generateSongTiles(5, 10)}
           <div className="emptysongtile">
             <svg
               className="tileicon"
@@ -161,9 +166,9 @@ export default function Dashboard() {
             </svg>
           </div>
         </div>
-        <h2>Playlists</h2>
+        <h2>Favourites</h2>
         <div className="songlist">
-          {songs.length && generateSongTiles(10, 13)}
+          {allSongs.length && generateSongTiles(10, 13)}
           <div className="emptysongtile">
             <svg
               className="tileicon"
@@ -182,7 +187,7 @@ export default function Dashboard() {
       </div>
       <div className="queuedsongs">
         <h2 className="title">Queued Songs</h2>
-        {songs.length && geneerateQueueListItems()}
+        {allSongs.length && geneerateQueueListItems()}
       </div>
     </div>
   );

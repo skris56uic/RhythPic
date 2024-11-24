@@ -3,10 +3,10 @@ import { createContext, useState, useRef } from "react";
 const AppContext = createContext();
 
 const AppContextProvider = ({ children }) => {
+  const [allSongs, setAllSongs] = useState([]);
+  const [currentSong, setCurrentSong] = useState(null);
   const [songProgress, setSongProgress] = useState(0);
-  const [songData, setSongData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(new Audio());
 
@@ -22,14 +22,14 @@ const AppContextProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
+        allSongs,
+        setAllSongs,
+        currentSong,
+        setCurrentSong,
         songProgress,
         setSongProgress,
-        songData,
-        setSongData,
         loading,
         setLoading,
-        error,
-        setError,
         isPlaying,
         setIsPlaying,
         audioRef,

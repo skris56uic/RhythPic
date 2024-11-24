@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { AppContext } from "./AppContextAndAppContextProvider";
@@ -7,11 +7,21 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Dashboard from "./components/Dashboard";
 import MusicPlayer from "./components/MusicPlayer";
+import { fetchListOfSongs } from "./api/api";
 
 import "./App.css";
 
 function App() {
-  const { songData, setSongData } = useContext(AppContext);
+  const { setAllSongs, setLoading } = useContext(AppContext);
+
+  useEffect(() => {
+    (async function () {
+      setLoading({ text: "Loading Songs ..." });
+      const data = await fetchListOfSongs();
+      setAllSongs(data.songs);
+      setLoading(null);
+    })();
+  }, []);
 
   return (
     <BrowserRouter>
@@ -22,7 +32,7 @@ function App() {
           <Route path="/musicplayer" element={<MusicPlayer />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-        {songData && <Footer />}
+        <Footer />
       </div>
     </BrowserRouter>
   );
