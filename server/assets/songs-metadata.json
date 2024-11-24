@@ -3,17 +3,80 @@
     {
       "id": "3YykTavXvEYywYJFZIngbT",
       "name": "Told You So",
-      "artist": "Mike Perry"
-    },
-    {
-      "id": "7qiZfU4dY1lWllzX7mPBI3",
-      "name": "Shape of You",
-      "artist": "Ed Sheeran"
+      "artist": "Mike Perry",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b27327a95fb36449db0bf5ca1303"
     },
     {
       "id": "7G0gBu6nLdhFDPRLc0HdDG",
       "name": "Mine (Taylor's Version)",
-      "artist": "Taylor Swift"
+      "artist": "Taylor Swift",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b2730b04da4f224b51ff86e0a481"
+    },
+    {
+      "id": "7gHs73wELdeycvS48JfIos",
+      "name": "Faded",
+      "artist": "Alan Walker",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b273c4d00cac55ae1b4598c9bc90"
+    },
+    {
+      "id": "7EkWXAI1wn8Ii883ecd9xr",
+      "name": "Freaks",
+      "artist": "Surf Curse",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b2739efda673310de265a2c1cf1f"
+    },
+    {
+      "id": "5opnBmQM3Go2PGvDjfpX2R",
+      "name": "Alone",
+      "artist": "Scarlett House",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b273e9159fe1903a1bd56cb63767"
+    },
+    {
+      "id": "4jp4Z02kzzg8gK0NmDGgml",
+      "name": "Play",
+      "artist": "K-391",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b273d0d90d516468655298b85062"
+    },
+    {
+      "id": "4h9wh7iOZ0GGn8QVp4RAOB",
+      "name": "I Ain't Worried",
+      "artist": "OneRepublic",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b273c01ab1c4b2dceb2cfc89e6fa"
+    },
+    {
+      "id": "4255amV4enzl28KAn16rUO",
+      "name": "Are You With Me",
+      "artist": "Lost Frequencies",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b273c01ab1c4b2dceb2cfc89e6fa"
+    },
+    {
+      "id": "3VBvV5wMMgEkrXqILx8JnB",
+      "name": "Legends Are Made",
+      "artist": "Sam Tinnesz",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b273135e22d962acdee73331c308"
+    },
+    {
+      "id": "3LlmKSHR3Rs0Y3KHQLAYDk",
+      "name": "Alone",
+      "artist": "Alan Walker",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b273a108e07c661f9fc54de9c43a"
+    },
+    {
+      "id": "20A2Xe76p9wxUFLbbzZjTM",
+      "name": "Time in a Bottle",
+      "artist": "Jim Croce",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b273ddba5c9e9a2c3f8c0df774de"
+    },
+    {
+      "id": "1sWeSMifj6Z6kZyI6z3bRc",
+      "name": "Warriors",
+      "artist": "Imagine Dragons",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b273fc4fd5caca9f1dc4a3b0460a"
+    },
+    {
+      "id": "0HqZX76SFLDz2aW8aiqi7G",
+      "name": "Bones",
+      "artist": "Imagine Dragons",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b273813713582dcc508e7d5073c4"
     }
   ]
 }
