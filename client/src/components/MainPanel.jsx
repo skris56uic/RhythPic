@@ -1,15 +1,19 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+
+import { AppContext } from "../AppContextAndAppContextProvider";
+
 import "./MainPanel.css";
 
 export default function MainPanel({
   width,
   opencloselyricspanel,
   openclosetriviapanel,
-  songData,
-  songProgress,
   sidepanelstate,
 }) {
+  const { songProgress } = useContext(AppContext);
+  const { songData } = useContext(AppContext);
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loadedImages, setLoadedImages] = useState([]);
 

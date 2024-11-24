@@ -1,13 +1,14 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useContext } from "react";
+
+import { AppContext } from "../AppContextAndAppContextProvider";
+
 import "./SidePanel.css";
 
-export default function SidePanel({
-  width,
-  sidepanelstate,
-  songData,
-  songProgress,
-}) {
+export default function SidePanel({ width, sidepanelstate }) {
+  const { songProgress } = useContext(AppContext);
+  const { songData } = useContext(AppContext);
+
   const lyricsContainerRef = useRef(null);
   const activeLyricRef = useRef(null);
   const triviaPanelRef = useRef(null);

@@ -14,12 +14,11 @@
 .playlists {
   height: 100%;
   width: 75vw;
-
-  overflow: hidden;
 }
 
 .songlist {
   display: flex;
+  flex-wrap: wrap;
   justify-content: left;
 
   gap: 10px;
@@ -29,16 +28,14 @@
 
 .songtile {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  padding: 10px;
 
-  min-width: 170px;
-  max-width: 170px;
-  min-height: 170px;
-  max-height: 170px;
+  min-width: 150px;
+  max-width: 150px;
 
-  background-color: var(--grey);
-  border-radius: 10px;
+  background-color: var(--black);
+  border-radius: 15px;
 
   transition: background-color 0.2s;
   text-decoration: none;
@@ -46,7 +43,7 @@
 }
 
 .songtile:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--grey);
 }
 
 .songdetails {
@@ -110,4 +107,32 @@
 
 .title {
   padding-left: 25px;
+}
+
+.songimages {
+  height: 150px;
+  width: 150px;
+
+  border-radius: 15px;
+}
+
+.emptysongtile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  margin: 10px;
+
+  min-height: 150px;
+  max-height: 150px;
+  min-width: 150px;
+  max-width: 150px;
+
+  background-color: var(--grey);
+  border-radius: 15px;
+
+  transition: background-color 0.2s;
+  text-decoration: none;
+  color: inherit;
 }

@@ -1,27 +1,26 @@
-/* eslint-disable react/prop-types */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-import starboyImage_1 from "../assets/STARBOY_01.jpeg";
+
+import { AppContext } from "../AppContextAndAppContextProvider";
+
 import "./Footer.css";
 
-export default function Footer({
-  songData,
-  audioRef,
-  isPlaying,
-  togglePlayPause,
-  setSongProgress,
-}) {
+export default function Footer() {
+  const { setSongProgress, songData, isPlaying, audioRef, togglePlayPause } =
+    useContext(AppContext);
+
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(100);
   const [currentLyric, setCurrentLyric] = useState("");
 
   useEffect(() => {
     const audio = audioRef.current;
+
     const handleTimeUpdate = () => {
       const currentTime = audio.currentTime;
       const duration = audio.duration;
       setProgress((currentTime / duration) * 100 || 0);
-	  setSongProgress((currentTime))
+      setSongProgress(currentTime);
       // Update current lyric
       if (songData?.isong?.lines) {
         const currentLine = songData.isong.lines
@@ -53,7 +52,7 @@ export default function Footer({
     const time = (value / 100) * audioRef.current.duration;
     audioRef.current.currentTime = time;
     setProgress(value);
-	setSongProgress(audioRef.current)
+    setSongProgress(audioRef.current);
   };
 
   return (
@@ -72,11 +71,7 @@ export default function Footer({
       <div className="allcontrols">
         {songData && (
           <Link to="/musicplayer" className="songinfo">
-            <img
-              className="albumcover"
-              src={starboyImage_1}
-              alt={"Album Cover"}
-            ></img>
+            <img className="albumcover" src alt={"Album Cover"}></img>
             <div className="songdetails">
               <span className="songname">{songData.name}</span>
               <span className="artists">{songData.artist}</span>

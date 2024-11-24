@@ -1,10 +1,22 @@
-/* eslint-disable react/prop-types */
+import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 
-import "./Dashboard.css";
-import { useEffect, useState } from "react";
+import { fetchSongData } from "../api/api";
+import { AppContext } from "../AppContextAndAppContextProvider";
 
-export default function Dashboard({ fetchSongData, loading, error }) {
+import "./Dashboard.css";
+
+export default function Dashboard() {
+  const {
+    songData,
+    setSongData,
+    loading,
+    setLoading,
+    error,
+    setError,
+    audioRef,
+  } = useContext(AppContext);
+
   const [songs, setSongs] = useState([]);
   const [loadingSongs, setLoadingSongs] = useState(true);
 
@@ -27,10 +39,41 @@ export default function Dashboard({ fetchSongData, loading, error }) {
     fetchSongs();
   }, []);
 
+  function generateSongTiles(from = 0, to = 5) {
+    const generatedSongTiles = [];
+    for (let i = from; i < to; i++) {
+      generatedSongTiles.push(
+        <Link
+          to="/musicplayer"
+          key={songs[i].id}
+          className="songtile"
+          onClick={() => handleSongClick(songs[i].id)}
+        >
+          <img
+            className="songimages"
+            src={songs[i].album_art_url}
+            alt={`${songs[i].name}\n${songs[i].artist}`}
+          ></img>
+          <div className="songdetails">
+            <span className="songname">{songs[i].name}</span>
+            <span className="artists">{songs[i].artist}</span>
+          </div>
+        </Link>
+      );
+    }
+
+    return generatedSongTiles;
+  }
+
   const handleSongClick = async (songId) => {
     const song = songs.find((s) => s.id === songId);
     if (song) {
-      await fetchSongData(songId);
+      const reply = await fetchSongData(songId);
+      audioRef.current.src = `http://localhost:3000/audio?id=${songId}`;
+      audioRef.current.load();
+      setLoading(true);
+      setError(null);
+      setSongData(reply);
     }
   };
 
@@ -42,21 +85,8 @@ export default function Dashboard({ fetchSongData, loading, error }) {
 
         {error && <div className="error">Error: {error}</div>}
         <div className="songlist">
-          {songs.map((song) => (
-            <Link
-              to="/musicplayer"
-              key={song.id}
-              className="songtile"
-              onClick={() => handleSongClick(song.id)}
-            >
-              <div className="songdetails">
-                <span className="songname">{song.name}</span>
-                <span className="artists">{song.artist}</span>
-              </div>
-            </Link>
-          ))}
-          <div className="songtile">Song</div>
-          <div className="songtile">
+          {generateSongTiles(0, 5)}
+          <div className="emptysongtile">
             <svg
               className="tileicon"
               xmlns="http://www.w3.org/2000/svg"
