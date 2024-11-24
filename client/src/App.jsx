@@ -12,9 +12,11 @@ import { fetchListOfSongs } from "./api/api";
 import "./App.css";
 
 function App() {
-  const { setAllSongs, setLoading } = useContext(AppContext);
+  const { allSongs, setAllSongs, setLoading } = useContext(AppContext);
 
   useEffect(() => {
+    console.log("app mounted");
+
     (async function () {
       setLoading({ text: "Loading Songs ..." });
       const data = await fetchListOfSongs();
@@ -29,7 +31,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/musicplayer" element={<MusicPlayer />} />
+          <Route path="/musicplayer/:songid" element={<MusicPlayer />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         <Footer />

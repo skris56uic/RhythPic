@@ -5,7 +5,7 @@ import { AppContext } from "../AppContextAndAppContextProvider";
 import "./SidePanel.css";
 
 export default function SidePanel({ width, sidepanelstate }) {
-  const { allSongs, currentSong, songProgress } = useContext(AppContext);
+  const { currentSong, songProgress } = useContext(AppContext);
 
   const lyricsContainerRef = useRef(null);
   const activeLyricRef = useRef(null);
