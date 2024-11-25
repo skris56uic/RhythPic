@@ -72,7 +72,7 @@ export default function Dashboard() {
     <Loader />
   ) : (
     <>
-      {allSongs && currentSong && (
+      {allSongs && (
         <div
           className="dashboard"
           style={{
