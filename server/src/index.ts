@@ -6,9 +6,9 @@ import * as compression from "compression";
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
-// const mongoUrl =
-// "mongodb+srv://skris56:rhythpic%40123@rhythpic.0wk5z.mongodb.net/lycris?retryWrites=true&w=majority&appName=rhythpic";
-const mongoUrl = "mongodb://localhost:27017/lycris";
+const mongoUrl =
+  "mongodb+srv://skris56:rhythpic%40123@rhythpic.0wk5z.mongodb.net/lycris?retryWrites=true&w=majority&appName=rhythpic";
+// const mongoUrl = "mongodb://localhost:27017/lycris";
 
 // Increase the limit for JSON payloads
 app.use(express.json({ limit: "50mb" }));
@@ -24,8 +24,8 @@ app.use(
 // Configure CORS with increased header limits
 app.use(
   cors({
-    // origin: "https://rhythpic-front.onrender.com",
-    origin: "http://localhost:5173",
+    origin: "https://rhythpic-front.onrender.com",
+    // origin: "http://localhost:5173",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
     credentials: true,

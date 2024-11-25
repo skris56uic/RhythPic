@@ -1,4 +1,4 @@
-const base_url = "http://localhost:3000";
+const base_url = "https://rhythpic.onrender.com";
 
 export async function fetchSongLyrics(songId) {
   try {
