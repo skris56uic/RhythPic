@@ -1,306 +1,151 @@
-/* eslint-disable react/prop-types */
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 
+import { AppContext } from "../AppContextAndAppContextProvider";
+import Loader from "./Loader";
+
 import "./Dashboard.css";
-import { useEffect, useState } from "react";
 
-export default function Dashboard({ fetchSongData, loading, error }) {
-  const [songs, setSongs] = useState([]);
-  const [loadingSongs, setLoadingSongs] = useState(true);
+export default function Dashboard() {
+  const { allSongs, currentSong, loading } = useContext(AppContext);
 
-  useEffect(() => {
-    const fetchSongs = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/songs");
-        if (!response.ok) {
-          throw new Error("Failed to fetch songs");
-        }
-        const data = await response.json();
-        setSongs(data.songs);
-      } catch (error) {
-        console.error("Error fetching songs:", error);
-      } finally {
-        setLoadingSongs(false);
-      }
-    };
-
-    fetchSongs();
-  }, []);
-
-  const handleSongClick = async (songId) => {
-    const song = songs.find((s) => s.id === songId);
-    if (song) {
-      await fetchSongData(songId);
+  function generateSongTiles(from = 0, to = 5) {
+    const generatedSongTiles = [];
+    for (let i = from; i < to; i++) {
+      generatedSongTiles.push(
+        <Link
+          to={`/musicplayer/${allSongs[i].id}`}
+          key={allSongs[i].id}
+          className="songtile"
+          onClick={() => handleSongClick(allSongs[i].id)}
+        >
+          <img
+            className="songimages"
+            src={allSongs[i].album_art_url}
+            alt={`${allSongs[i].name}\n${allSongs[i].artist}`}
+          ></img>
+          <div className="songdetails">
+            <span className="songname">{allSongs[i].name}</span>
+            <span className="artists">{allSongs[i].artist}</span>
+          </div>
+        </Link>
+      );
     }
-  };
 
-  return (
-    <div className="dashboard">
-      <div className="playlists">
-        <h2>Recently Played</h2>
-        {loading && <div className="loading">Loading songs...</div>}
+    return generatedSongTiles;
+  }
 
-        {error && <div className="error">Error: {error}</div>}
-        <div className="songlist">
-          {songs.map((song) => (
-            <Link
-              to="/musicplayer"
-              key={song.id}
-              className="songtile"
-              onClick={() => handleSongClick(song.id)}
-            >
-              <div className="songdetails">
-                <span className="songname">{song.name}</span>
-                <span className="artists">{song.artist}</span>
+  function geneerateQueueListItems() {
+    const queueListItems = [];
+    for (let i = 0; i < allSongs.length; i++) {
+      queueListItems.push(
+        <Link
+          to={`/musicplayer/${allSongs[i].id}`}
+          key={allSongs[i].id}
+          className="queueListitem"
+          onClick={() => handleSongClick(allSongs[i].id)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="playicon"
+          >
+            <path
+              fillRule="evenodd"
+              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <div className="songdetails">
+            <span className="songname">{allSongs[i].name}</span>
+            <span className="artists">{allSongs[i].artist}</span>
+          </div>
+        </Link>
+      );
+    }
+
+    return queueListItems;
+  }
+
+  return loading ? (
+    <Loader />
+  ) : (
+    <>
+      {allSongs && currentSong && (
+        <div
+          className="dashboard"
+          style={{
+            height: `${
+              currentSong
+                ? "calc(100vh - (var(--footerheight) + var(--navbarheight)))"
+                : "calc(100vh - (var(--navbarheight)))"
+            }`,
+          }}
+        >
+          <div className="playlists">
+            <h2>Recently Played</h2>
+
+            <div className="songlist">
+              {allSongs.length && generateSongTiles(0, 5)}
+              <div className="emptysongtile">
+                <svg
+                  className="tileicon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </div>
-            </Link>
-          ))}
-          <div className="songtile">Song</div>
-          <div className="songtile">
-            <svg
-              className="tileicon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
-                clipRule="evenodd"
-              />
-            </svg>
+            </div>
+            <h2>All Songs</h2>
+            <div className="songlist">
+              {allSongs.length && generateSongTiles(5, 10)}
+              <div className="emptysongtile">
+                <svg
+                  className="tileicon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+            <h2>Favourites</h2>
+            <div className="songlist">
+              {allSongs.length && generateSongTiles(10, 13)}
+              <div className="emptysongtile">
+                <svg
+                  className="tileicon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div className="queuedsongs">
+            <h2 className="title">Queued Songs</h2>
+            {allSongs.length && geneerateQueueListItems()}
           </div>
         </div>
-        <h2>All Songs</h2>
-        <div className="songlist">
-          <div className="songtile">Song</div>
-          <div className="songtile">Song</div>
-          <div className="songtile">Song</div>
-          <div className="songtile">Song</div>
-          <div className="songtile">Song</div>
-          <div className="songtile">
-            <svg
-              className="tileicon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        </div>
-        <h2>Playlists</h2>
-        <div className="songlist">
-          <div className="songtile">Song</div>
-          <div className="songtile">Song</div>
-          <div className="songtile">Song</div>
-          <div className="songtile">Song</div>
-          <div className="songtile">Song</div>
-          <div className="songtile">
-            <svg
-              className="tileicon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
-      <div className="queuedsongs">
-        <h2 className="title">Queued Songs</h2>
-        <Link to="/musicplayer" className="queueListitem">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="playicon"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="songdetails">
-            <span className="songname">Photograph</span>
-            <span className="artists">Ed Sheeran</span>
-          </div>
-        </Link>
-        <Link to="/musicplayer" className="queueListitem">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="playicon"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="songdetails">
-            <span className="songname">Back To You</span>
-            <span className="artists">Selena Gomez</span>
-          </div>
-        </Link>
-        <Link to="/musicplayer" className="queueListitem">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="playicon"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="songdetails">
-            <span className="songname">Believer</span>
-            <span className="artists">Imagine Dragons</span>
-          </div>
-        </Link>
-        <Link to="/musicplayer" className="queueListitem">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="playicon"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="songdetails">
-            <span className="songname">Night Changes</span>
-            <span className="artists">One Direction</span>
-          </div>
-        </Link>
-        <Link to="/musicplayer" className="queueListitem">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="playicon"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="songdetails">
-            <span className="songname">Paris</span>
-            <span className="artists">The Chainsmokers</span>
-          </div>
-        </Link>
-        <Link to="/musicplayer" className="queueListitem">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="playicon"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="songdetails">
-            <span className="songname">Something Just Like This</span>
-            <span className="artists">The Chainsmokers</span>
-          </div>
-        </Link>
-        <Link to="/musicplayer" className="queueListitem">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="playicon"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="songdetails">
-            <span className="songname">Wanna Be Yours</span>
-            <span className="artists">Artic Monkeys</span>
-          </div>
-        </Link>
-        <Link to="/musicplayer" className="queueListitem">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="playicon"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="songdetails">
-            <span className="songname">Paradise</span>
-            <span className="artists">Coldplay</span>
-          </div>
-        </Link>
-        <Link to="/musicplayer" className="queueListitem">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="playicon"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="songdetails">
-            <span className="songname">Legends Never Die</span>
-            <span className="artists">
-              League of Legends and Against The Current
-            </span>
-          </div>
-        </Link>
-        <Link to="/musicplayer" className="queueListitem">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="playicon"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="songdetails">
-            <span className="songname">Dandelions</span>
-            <span className="artists">Ruth B. and The Piano Guys</span>
-          </div>
-        </Link>
-      </div>
-    </div>
+      )}
+    </>
   );
 }

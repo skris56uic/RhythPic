@@ -51,12 +51,11 @@
 }
 
 .image-container {
-  position: fixed;
-  top: calc(var(--navbarheight) + 20px);
-  left: 0px;
-  height: calc(100vh - (var(--footerheight) + var(--navbarheight) + 0px));
+  height: calc(100vh - (var(--footerheight) + var(--navbarheight)));
   width: 100%;
+
   overflow: hidden;
+
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -69,7 +68,6 @@
   border-radius: 20px;
 }
 
-/* Add specific styling for the alt text */
 .generatedimage:not([src]),
 .generatedimage[src=""],
 .generatedimage[src="#"] {
