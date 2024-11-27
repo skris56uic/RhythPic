@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import SidePanel from "./SidePanel";
 import MainPanel from "./MainPanel";
 import { AppContext } from "../AppContextAndAppContextProvider";
-import { fetchSongLyrics, fetchSongTrivia } from "../api/api";
+import { base_url, fetchSongLyrics, fetchSongTrivia } from "../api/api";
 
 import "./MusicPlayer.css";
 import Loader from "./Loader";
@@ -71,7 +71,7 @@ export default function MusicPlayer() {
 
           setCurrentSong(newAllSongs.find((song) => song.id === songid));
 
-          audioRef.current.src = `http://localhost:3000/audio?id=${songid}`;
+          audioRef.current.src = `${base_url}/audio?id=${songid}`;
           audioRef.current.load();
 
           setLoading(null);
