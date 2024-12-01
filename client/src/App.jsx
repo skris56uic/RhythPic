@@ -10,6 +10,7 @@ import MusicPlayer from "./components/MusicPlayer";
 import { fetchListOfSongs } from "./api/api";
 
 import "./App.css";
+import SearchResult from "./components/SearchResult";
 
 function App() {
   const { allSongs, setAllSongs, setLoading } = useContext(AppContext);
@@ -28,11 +29,12 @@ function App() {
   return (
     <BrowserRouter>
       <div className="app">
-        <Navbar />
+        <Navbar/>
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/musicplayer/:songid" element={<MusicPlayer />} />
           <Route path="*" element={<Navigate to="/" />} />
+          <Route path="/searchresult/:searchvalue" element={<SearchResult />} />
         </Routes>
         <Footer />
       </div>

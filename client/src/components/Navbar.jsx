@@ -1,15 +1,24 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useContext} from "react";
+import { Link , useNavigate} from "react-router-dom";
 
 import "./Navbar.css";
 import logo from "../assets/logo/RHYTHPIC_LOGO_SMALL.png";
 
 function Navbar() {
-  const [inputValue, setInputValue] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (event) => {
-    setInputValue(event.target.value);
+    setSearchValue(event.target.value);
   };
+
+  const handleSearchClick = () => {
+      // If there's a search value and exactly one match, navigate to that song's page
+    if (searchValue.trim() !== "") {
+      navigate(`/searchresult/${searchValue}`);
+    }
+  };
+
 
   return (
     <nav className="navbar">
@@ -18,7 +27,19 @@ function Navbar() {
         <h2 className="logotext">RhythPic</h2>
       </Link>
       <div className="searchandicon">
-        <svg
+        <input
+          className="search"
+          type="text"
+          id="inputField"
+          value={searchValue}
+          onChange={handleChange}
+          placeholder="Search your Favourite song..."
+        />
+        <button 
+          className="search-button" 
+          onClick={handleSearchClick} 
+          aria-label="Search">
+          <svg
           className="searchicon"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -32,15 +53,9 @@ function Navbar() {
             d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
           />
         </svg>
-        <input
-          className="search"
-          type="text"
-          id="inputField"
-          value={inputValue}
-          onChange={handleChange}
-          placeholder="Search your Favourite song..."
-        />
+        </button>
       </div>
+      
 
       <ul className="nav-links">
         <li>

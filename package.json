@@ -12,5 +12,11 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "compression": "^1.7.5"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.7.5"
+  }
 }

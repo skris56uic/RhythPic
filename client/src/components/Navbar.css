@@ -63,8 +63,6 @@
   align-items: center;
 
   background-color: var(--grey);
-
-  padding: 10px;
   border-radius: 999px;
 
   color: var(--white);
@@ -74,10 +72,9 @@
   width: 400px;
 
   background-color: var(--grey);
-
   border: 0px;
   border-radius: 999px;
-
+  padding-left: 10px;
   font-size: 1.1rem;
 
   color: var(--white);
@@ -128,4 +125,33 @@
 
 .usericon:hover {
   color: var(--purple);
+}
+
+.search-button {
+  background-color: #bb6bfc; /* Set background color */
+  border: none; /* Remove border */
+  margin-right: 10px;
+  width: 30px;
+  height: 30px;
+  margin: 5px;
+  margin-right: 8px;
+  cursor: pointer; /* Change cursor on hover */
+  padding: 2px; /* Add padding to increase size */
+  border-radius: 90%; /* Make the button circular */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+  transition: transform 0.2s, opacity 0.2s; /* Add smooth hover effect */
+}
+
+.search-button:hover {
+  transform: scale(1.1); /* Slightly increase size on hover */
+  opacity: 0.9; /* Slightly reduce opacity on hover */
+}
+
+.search-icon {
+  width: 40px; /* Set icon size */
+  height: 40px;
+  color: white; /* Change icon color */
 }
