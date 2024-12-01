@@ -7,7 +7,19 @@ import Loader from "./Loader";
 import "./Dashboard.css";
 
 export default function Dashboard() {
-  const { allSongs, currentSong, loading } = useContext(AppContext);
+  const { allSongs, setAllSongs, currentSong, loading } =
+    useContext(AppContext);
+
+  function handleFavouriteClick(songId) {
+    const updatedSongs = allSongs.map((song) => {
+      if (song.id === songId) {
+        return { ...song, favourite: !song.favourite };
+      }
+      return song;
+    });
+
+    setAllSongs(updatedSongs);
+  }
 
   function generateSongTiles(from = 0, to = 5) {
     const generatedSongTiles = [];
@@ -17,17 +29,36 @@ export default function Dashboard() {
           to={`/musicplayer/${allSongs[i].id}`}
           key={allSongs[i].id}
           className="songtile"
-          onClick={() => handleSongClick(allSongs[i].id)}
         >
           <img
             className="songimages"
             src={allSongs[i].album_art_url}
             alt={`${allSongs[i].name}\n${allSongs[i].artist}`}
           ></img>
+
           <div className="songdetails">
             <span className="songname">{allSongs[i].name}</span>
             <span className="artists">{allSongs[i].artist}</span>
           </div>
+
+          <button className="dashboardfavouritesbutton">
+            <svg
+              className={
+                `dashboardfavouritesicon` +
+                (allSongs[i].favourite ? " dashboardfavouritesiconactive" : "")
+              }
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleFavouriteClick(allSongs[i].id);
+              }}
+            >
+              <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+            </svg>
+          </button>
         </Link>
       );
     }
@@ -43,7 +74,6 @@ export default function Dashboard() {
           to={`/musicplayer/${allSongs[i].id}`}
           key={allSongs[i].id}
           className="queueListitem"
-          onClick={() => handleSongClick(allSongs[i].id)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -87,7 +117,8 @@ export default function Dashboard() {
             <h2>Recently Played</h2>
 
             <div className="songlist">
-              {allSongs.length && generateSongTiles(0, 5)}
+              {allSongs.length &&
+                generateSongTiles(0, parseInt(allSongs.length / 4))}
               <div className="emptysongtile">
                 <svg
                   className="tileicon"
@@ -105,25 +136,11 @@ export default function Dashboard() {
             </div>
             <h2>All Songs</h2>
             <div className="songlist">
-              {allSongs.length && generateSongTiles(5, 10)}
-              <div className="emptysongtile">
-                <svg
-                  className="tileicon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            </div>
-            <h2>Favourites</h2>
-            <div className="songlist">
-              {allSongs.length && generateSongTiles(10, 13)}
+              {allSongs.length &&
+                generateSongTiles(
+                  parseInt(allSongs.length / 4) + 1,
+                  parseInt(allSongs.length)
+                )}
               <div className="emptysongtile">
                 <svg
                   className="tileicon"

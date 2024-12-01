@@ -1,4 +1,4 @@
-.searchdashboard {
+.favouritesdashboard {
   display: flex;
 
   margin-left: 20px;
@@ -11,7 +11,7 @@
   overflow-y: scroll;
 }
 
-.searchsonglist {
+.favouritessonglist {
   display: flex;
   flex-wrap: wrap;
   justify-content: left;
@@ -21,9 +21,7 @@
   width: 100%;
 }
 
-.searchsongtile {
-  position: relative;
-
+.favouritessongtile {
   display: flex;
   flex-direction: column;
   padding: 10px;
@@ -39,11 +37,11 @@
   color: inherit;
 }
 
-.searchsongtile:hover {
+.favouritessongtile:hover {
   background-color: var(--grey);
 }
 
-.searchsongdetails {
+.favouritessongdetails {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -52,24 +50,24 @@
   padding: 10px;
 }
 
-.searchsongname {
+.favouritessongname {
   font-size: 1rem;
   font-weight: bold;
 }
 
-.searchartists {
+.favouritesartists {
   font-size: 0.9rem;
   color: #aaa;
 }
 
-.searchsongimages {
+.favouritessongimages {
   height: 150px;
   width: 150px;
 
   border-radius: 15px;
 }
 
-.searchfavouritesbutton {
+.favouritesfavouritesbutton {
   position: absolute;
   right: 15px;
   top: 15px;
@@ -86,7 +84,7 @@
   cursor: pointer;
 }
 
-.searchfavouritesicon {
+.favouritesfavouritesicon {
   height: 32px;
   width: 32px;
 
@@ -96,10 +94,10 @@
   cursor: pointer;
 }
 
-.searchfavouritesicon:hover {
+.favouritesfavouritesicon:hover {
   color: var(--red);
 }
 
-.searchfavouritesiconactive {
+.favouritesfavouritesiconactive {
   color: var(--red);
 }
