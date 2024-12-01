@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Dashboard from "./components/Dashboard";
 import MusicPlayer from "./components/MusicPlayer";
+import SearchResult from "./components/SearchResult";
 import { fetchListOfSongs } from "./api/api";
 
 import "./App.css";
@@ -32,6 +33,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/musicplayer/:songid" element={<MusicPlayer />} />
+          <Route path="/searchresult/:searchvalue" element={<SearchResult />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         <Footer />

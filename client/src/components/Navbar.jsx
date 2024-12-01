@@ -1,14 +1,21 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import "./Navbar.css";
 import logo from "../assets/logo/RHYTHPIC_LOGO_SMALL.png";
 
 function Navbar() {
-  const [inputValue, setInputValue] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (event) => {
-    setInputValue(event.target.value);
+    setSearchValue(event.target.value);
+  };
+
+  const handleSearchClick = () => {
+    if (searchValue.trim() !== "") {
+      navigate(`/searchresult/${searchValue}`);
+    }
   };
 
   return (
@@ -23,7 +30,7 @@ function Navbar() {
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          strokeWidth={1.5}
+          strokeWidth={3}
           stroke="currentColor"
         >
           <path
@@ -36,8 +43,14 @@ function Navbar() {
           className="search"
           type="text"
           id="inputField"
-          value={inputValue}
+          value={searchValue}
           onChange={handleChange}
+          autoComplete="off"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSearchClick();
+            }
+          }}
           placeholder="Search your Favourite song..."
         />
       </div>
