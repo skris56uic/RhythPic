@@ -30,6 +30,9 @@ const AppContextProvider = ({ children }) => {
 
   useEffect(() => {
     audioRef.current = new Audio();
+    // Set initial volume from localStorage or default to 100%
+    const savedVolume = localStorage.getItem("volume");
+    audioRef.current.volume = savedVolume ? Number(savedVolume) / 100 : 1;
 
     return () => {
       audioRef.current.pause();

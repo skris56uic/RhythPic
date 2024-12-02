@@ -21,7 +21,14 @@ export default function Footer() {
   } = useContext(AppContext);
 
   const [progress, setProgress] = useState(0);
-  const [volume, setVolume] = useState(100);
+  const [volume, setVolume] = useState(() => {
+    const savedVolume = localStorage.getItem("volume");
+    // Initialize audio volume with saved value or default to 100
+    if (audioRef.current) {
+      audioRef.current.volume = savedVolume ? Number(savedVolume) / 100 : 1;
+    }
+    return savedVolume ? Number(savedVolume) : 100;
+  });
 
   useEffect(() => {
     if (currentSong) {
@@ -41,6 +48,7 @@ export default function Footer() {
     const value = Number(e.target.value);
     setVolume(value);
     audioRef.current.volume = value / 100;
+    localStorage.setItem("volume", value.toString());
   };
 
   const handleProgressChange = (e) => {
