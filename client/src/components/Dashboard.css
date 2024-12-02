@@ -27,6 +27,8 @@
 }
 
 .songtile {
+  position: relative;
+
   display: flex;
   flex-direction: column;
   padding: 10px;
@@ -73,8 +75,10 @@
 }
 
 .playicon {
-  height: 45px;
-  width: 45px;
+  min-height: 45px;
+  min-width: 45px;
+  max-width: 45px;
+  max-height: 45px;
 
   padding: 10px;
   color: var(--white);
@@ -135,4 +139,39 @@
   transition: background-color 0.2s;
   text-decoration: none;
   color: inherit;
+}
+
+.dashboardfavouritesbutton {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 5px;
+  background-color: var(--lightgrey);
+
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.dashboardfavouritesicon {
+  height: 32px;
+  width: 32px;
+
+  color: var(--white);
+  transition: 0.33s;
+
+  cursor: pointer;
+}
+
+.dashboardfavouritesicon:hover {
+  color: var(--red);
+}
+
+.dashboardfavouritesiconactive {
+  color: var(--red);
 }

@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import { AppContext } from "../AppContextAndAppContextProvider";
 import Loader from "./Loader";
 
-import "./Dashboard.css";
+import "./favourites.css";
 
-export default function Dashboard() {
+export default function Favourites() {
   const { allSongs, setAllSongs, currentSong, loading } =
     useContext(AppContext);
 
@@ -36,10 +36,11 @@ export default function Dashboard() {
     }
   }
 
-  function generateSongTiles(from = 0, to = 5) {
-    const generatedSongTiles = [];
-    for (let i = from; i < to; i++) {
-      generatedSongTiles.push(
+  function generateFavouriteSongTiles() {
+    const generatedFavouriteSongTiles = [];
+    for (let i = 0; i < allSongs.length; i++) {
+      if (!allSongs[i].favourite) continue;
+      generatedFavouriteSongTiles.push(
         <Link
           to={`/musicplayer/${allSongs[i].id}`}
           key={allSongs[i].id}
@@ -56,11 +57,11 @@ export default function Dashboard() {
             <span className="artists">{allSongs[i].artist}</span>
           </div>
 
-          <button className="dashboardfavouritesbutton">
+          <button className="favouritesfavouritesbutton">
             <svg
               className={
-                `dashboardfavouritesicon` +
-                (allSongs[i].favourite ? " dashboardfavouritesiconactive" : "")
+                `favouritesfavouritesicon` +
+                (allSongs[i].favourite ? " favouritesfavouritesiconactive" : "")
               }
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -78,39 +79,7 @@ export default function Dashboard() {
       );
     }
 
-    return generatedSongTiles;
-  }
-
-  function geneerateQueueListItems() {
-    const queueListItems = [];
-    for (let i = 0; i < allSongs.length; i++) {
-      queueListItems.push(
-        <Link
-          to={`/musicplayer/${allSongs[i].id}`}
-          key={allSongs[i].id}
-          className="queueListitem"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="playicon"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div className="songdetails">
-            <span className="songname">{allSongs[i].name}</span>
-            <span className="artists">{allSongs[i].artist}</span>
-          </div>
-        </Link>
-      );
-    }
-
-    return queueListItems;
+    return generatedFavouriteSongTiles;
   }
 
   return loading ? (
@@ -119,7 +88,7 @@ export default function Dashboard() {
     <>
       {allSongs && (
         <div
-          className="dashboard"
+          className="favouritesdashboard"
           style={{
             height: `${
               currentSong
@@ -128,18 +97,16 @@ export default function Dashboard() {
             }`,
           }}
         >
-          <div className="playlists">
-            <h2>Recently Played</h2>
-
-            <div className="songlist"></div>
-            <h2>All Songs</h2>
-            <div className="songlist">
-              {allSongs.length && generateSongTiles(0, allSongs.length)}
+          <div>
+            <h2>Favourites</h2>
+            <div className="favouritessonglist">
+              {allSongs.length &&
+                (generateFavouriteSongTiles().length === 0 ? (
+                  <div>No songs found</div>
+                ) : (
+                  generateFavouriteSongTiles()
+                ))}
             </div>
-          </div>
-          <div className="queuedsongs">
-            <h2 className="title">Queued Songs</h2>
-            {allSongs.length && geneerateQueueListItems()}
           </div>
         </div>
       )}
