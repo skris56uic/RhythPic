@@ -19,6 +19,21 @@ export default function Dashboard() {
     });
 
     setAllSongs(updatedSongs);
+
+    if (localStorage.getItem("favourites")) {
+      const favourites = JSON.parse(localStorage.getItem("favourites"));
+      if (favourites.includes(songId)) {
+        const updatedFavourites = favourites.filter((id) => id !== songId);
+        localStorage.setItem("favourites", JSON.stringify(updatedFavourites));
+      } else {
+        localStorage.setItem(
+          "favourites",
+          JSON.stringify([...favourites, songId])
+        );
+      }
+    } else {
+      localStorage.setItem("favourites", JSON.stringify([songId]));
+    }
   }
 
   function generateSongTiles(from = 0, to = 5) {

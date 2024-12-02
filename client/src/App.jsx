@@ -14,13 +14,25 @@ import { fetchListOfSongs } from "./api/api";
 import "./App.css";
 
 function App() {
-  const { allSongs, setAllSongs, setLoading } = useContext(AppContext);
+  const { setAllSongs, setLoading } = useContext(AppContext);
 
   useEffect(() => {
     (async function () {
       setLoading({ text: "Loading Songs ..." });
       const data = await fetchListOfSongs();
-      setAllSongs(data.songs);
+
+      if (localStorage.getItem("favourites")) {
+        const favourites = JSON.parse(localStorage.getItem("favourites"));
+        const updatedSongs = data.songs.map((song) => {
+          if (favourites.includes(song.id)) {
+            return { ...song, favourite: true };
+          }
+          return song;
+        });
+        setAllSongs(updatedSongs);
+      } else {
+        setAllSongs(data.songs);
+      }
       setLoading(null);
     })();
   }, []);
