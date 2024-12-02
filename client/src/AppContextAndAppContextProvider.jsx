@@ -135,14 +135,8 @@ const AppContextProvider = ({ children }) => {
     setRepeatMode(modes[(currentIndex + 1) % modes.length]);
   };
 
-  const playSong = async (song, isFromQueue = false) => {
+  const playSong = async (song) => {
     try {
-      console.log(
-        "PlaySong called with:",
-        song.name,
-        "isFromQueue:",
-        isFromQueue
-      );
       setLoading({ text: "Loading Song..." });
 
       // Stop current playback
@@ -152,7 +146,6 @@ const AppContextProvider = ({ children }) => {
 
       // Load song details if needed
       if (!song.lyricsAndImages) {
-        console.log("Fetching lyrics and trivia for:", song.name);
         const lyrics = await fetchSongLyrics(song.id);
         const trivia = await fetchSongTrivia(lyrics.fileName);
 
@@ -175,7 +168,6 @@ const AppContextProvider = ({ children }) => {
       // Wait for audio to be loaded
       await new Promise((resolve, reject) => {
         audioRef.current.onloadeddata = () => {
-          console.log("Audio loaded successfully");
           resolve();
         };
         audioRef.current.onerror = (e) => {
@@ -186,23 +178,12 @@ const AppContextProvider = ({ children }) => {
       });
 
       // Update states after audio is loaded
-      console.log("Updating states for:", song.name);
       setCurrentSong(song);
       addToRecentlyPlayed(song);
 
       // Play the audio
       await audioRef.current.play();
       setIsPlaying(true);
-
-      // Handle queue after successful play
-      if (isFromQueue) {
-        console.log("Removing from queue:", song.name);
-        setQueuedSongs((prev) => {
-          const newQueue = prev.filter((s) => s.id !== song.id);
-          console.log("New queue length:", newQueue.length);
-          return newQueue;
-        });
-      }
 
       setLoading(null);
       return true;
@@ -214,13 +195,6 @@ const AppContextProvider = ({ children }) => {
   };
 
   const playNext = async () => {
-    console.log("PlayNext called, current song:", currentSong?.name);
-    console.log(
-      "Current queue:",
-      queuedSongs.map((s) => s.name)
-    );
-    console.log("Repeat mode:", repeatMode);
-
     try {
       // If repeat one is enabled, replay current song
       if (repeatMode === "one") {
@@ -233,69 +207,47 @@ const AppContextProvider = ({ children }) => {
         if (randomSong) {
           await playSong(randomSong);
         }
-      } else {
-        // First check if current song is in queue
-        const currentQueueIndex = queuedSongs.findIndex(
-          (s) => s.id === currentSong?.id
-        );
-        console.log("Current queue index:", currentQueueIndex);
+        return;
+      }
 
-        if (currentQueueIndex !== -1) {
-          // Currently playing a queued song
-          console.log("Current song is in queue");
-          if (currentQueueIndex + 1 < queuedSongs.length) {
-            // There's a next song in queue
-            const nextSong = queuedSongs[currentQueueIndex + 1];
-            console.log("Playing next queued song:", nextSong.name);
-            const success = await playSong(nextSong, true);
-            if (success) {
-              // Remove only the current song from queue
-              setQueuedSongs((prev) =>
-                prev.filter((s) => s.id !== currentSong.id)
-              );
-            }
-          } else {
-            // No more songs in queue, go back to all songs
-            console.log("No more queued songs, going back to all songs");
-            const allSongsIndex = allSongs.findIndex(
-              (s) => s.id === currentSong.id
-            );
-            let nextIndex = (allSongsIndex + 1) % allSongs.length;
+      // Check if current song is in queue
+      const currentQueueIndex = queuedSongs.findIndex(
+        (s) => s.id === currentSong?.id
+      );
 
-            // If we're at the end and repeat all is not enabled, stop
-            if (nextIndex === 0 && repeatMode !== "all") {
-              return;
-            }
+      if (queuedSongs.length > 0) {
+        let nextSong;
+        let newQueue;
 
-            await playSong(allSongs[nextIndex], false);
-            setQueuedSongs((prev) =>
-              prev.filter((s) => s.id !== currentSong.id)
-            );
-          }
-        } else if (queuedSongs.length > 0) {
-          // Not playing a queued song but queue exists
-          console.log("Starting queue playback");
-          const nextSong = queuedSongs[0];
-          const success = await playSong(nextSong, true);
-          if (success) {
-            setQueuedSongs((prev) => prev.slice(1));
-          }
+        if (currentQueueIndex === -1) {
+          // Current song not in queue, play first queued song
+          nextSong = queuedSongs[0];
+          newQueue = queuedSongs.slice(1);
+        } else if (currentQueueIndex + 1 < queuedSongs.length) {
+          // Play next song in queue
+          nextSong = queuedSongs[currentQueueIndex + 1];
+          newQueue = queuedSongs.slice(currentQueueIndex + 1);
         } else {
-          // No queue, play from all songs
-          console.log("Playing from all songs");
-          const currentIndex = allSongs.findIndex(
+          // End of queue reached, find current song in all songs and play next
+          const currentAllSongsIndex = allSongs.findIndex(
             (s) => s.id === currentSong.id
           );
-          if (currentIndex > -1) {
-            let nextIndex = (currentIndex + 1) % allSongs.length;
+          const nextIndex = (currentAllSongsIndex + 1) % allSongs.length;
+          nextSong = allSongs[nextIndex];
+          newQueue = [];
+        }
 
-            // If we're at the end and repeat all is not enabled, stop
-            if (nextIndex === 0 && repeatMode !== "all") {
-              return;
-            }
-
-            await playSong(allSongs[nextIndex], false);
-          }
+        const success = await playSong(nextSong, true);
+        if (success) {
+          setQueuedSongs(newQueue);
+        }
+      } else {
+        // No queue, play from all songs
+        const currentIndex = allSongs.findIndex((s) => s.id === currentSong.id);
+        if (currentIndex > -1) {
+          // Always go to next song, wrapping around to beginning if at end
+          const nextIndex = (currentIndex + 1) % allSongs.length;
+          await playSong(allSongs[nextIndex], false);
         }
       }
     } catch (error) {
@@ -305,36 +257,29 @@ const AppContextProvider = ({ children }) => {
   };
 
   const playPrevious = async () => {
-    console.log("PlayPrevious called, current song:", currentSong?.name);
-    console.log(
-      "Current queue:",
-      queuedSongs.map((s) => s.name)
-    );
-
     try {
-      // Check if the current song is in the recently played list
-      const currentIndex = recentlyPlayed.findIndex(
+      // Check if current song is in queue
+      const currentQueueIndex = queuedSongs.findIndex(
         (s) => s.id === currentSong?.id
       );
-      console.log("Current index in recently played:", currentIndex);
 
-      if (currentIndex > 0) {
-        // There's a song before the current song in the recently played list
-        const previousSong = recentlyPlayed[currentIndex - 1];
-        console.log(
-          "Playing previous song from recently played:",
-          previousSong.name
-        );
+      if (currentQueueIndex !== -1 || queuedSongs.length > 0) {
+        // If song is in queue or queue exists, just restart current song
+        audioRef.current.currentTime = 0;
+        if (!isPlaying) {
+          await audioRef.current.play();
+          setIsPlaying(true);
+        }
+        return;
+      }
 
-        // Add the previous song to the beginning of the queue
-        setQueuedSongs((prev) => [previousSong, ...prev]);
-
-        // Play the previous song from the queue
-        await playSong(previousSong, true);
-      } else {
-        // The current song is the first in the recently played list, so play it again
-        console.log("Playing current song again");
-        await playSong(currentSong, true);
+      // If not in queue, handle navigation through all songs list
+      const currentIndex = allSongs.findIndex((s) => s.id === currentSong.id);
+      if (currentIndex > -1) {
+        // If it's the first song, go to the last song
+        const prevIndex =
+          currentIndex === 0 ? allSongs.length - 1 : currentIndex - 1;
+        await playSong(allSongs[prevIndex], false);
       }
     } catch (error) {
       console.error("Error in playPrevious:", error);

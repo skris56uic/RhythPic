@@ -18,6 +18,7 @@ export default function Dashboard() {
     removeFromQueue,
     playQueuedSong,
     recentlyPlayed,
+    setIsPlaying,
   } = useContext(AppContext);
 
   function handleFavouriteClick(songId) {
@@ -48,6 +49,7 @@ export default function Dashboard() {
 
   async function handleQueueItemClick(song) {
     await playQueuedSong(song);
+    setIsPlaying(false);
     navigate(`/musicplayer/${song.id}`);
   }
 
