@@ -233,3 +233,40 @@
   font-size: 0.9rem;
   text-align: center;
 }
+
+.add-to-queue-button.in-queue {
+  background-color: var(--purple);
+}
+
+.queue-icon.in-queue {
+  color: var(--black);
+}
+
+/* Optional hover effect for when song is in queue */
+.add-to-queue-button.in-queue:hover {
+  background-color: var(--lightgrey);
+}
+
+.add-to-queue-button.in-queue:hover .queue-icon.in-queue {
+  color: var(--purple);
+}
+
+/* Add tooltip for better UX */
+.add-to-queue-button {
+  position: relative;
+}
+
+.add-to-queue-button:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--lightgrey);
+  color: var(--white);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 10;
+}

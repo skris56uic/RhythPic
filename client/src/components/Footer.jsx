@@ -95,6 +95,7 @@ export default function Footer() {
               strokeWidth="0.5"
               onClick={toggleShuffle}
               className={`footericonsmall ${isShuffle ? "active" : ""}`}
+              data-tooltip={isShuffle ? "Disable shuffle" : "Enable shuffle"}
             >
               <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
               <g
@@ -118,6 +119,7 @@ export default function Footer() {
               viewBox="0 0 24 24"
               fill="currentColor"
               onClick={playPrevious}
+              data-tooltip="Previous track"
             >
               <path d="M9.195 18.44c1.25.714 2.805-.189 2.805-1.629v-2.34l6.945 3.968c1.25.715 2.805-.188 2.805-1.628V8.69c0-1.44-1.555-2.343-2.805-1.628L12 11.029v-2.34c0-1.44-1.555-2.343-2.805-1.628l-7.108 4.061c-1.26.72-1.26 2.536 0 3.256l7.108 4.061Z" />
             </svg>
@@ -128,6 +130,7 @@ export default function Footer() {
                 fill="currentColor"
                 className="footericon"
                 onClick={togglePlayPause}
+                data-tooltip={isPlaying ? "Pause" : "Play"}
               >
                 <path
                   fillRule="evenodd"
@@ -142,6 +145,7 @@ export default function Footer() {
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 onClick={togglePlayPause}
+                data-tooltip={isPlaying ? "Pause" : "Play"}
               >
                 <path
                   fillRule="evenodd"
@@ -156,6 +160,7 @@ export default function Footer() {
               fill="currentColor"
               className="footericon"
               onClick={playNext}
+              data-tooltip="Next track"
             >
               <path d="M5.055 7.06C3.805 6.347 2.25 7.25 2.25 8.69v8.122c0 1.44 1.555 2.343 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.343 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256l-7.108-4.061C13.555 6.346 12 7.249 12 8.689v2.34L5.055 7.061Z" />
             </svg>
@@ -180,6 +185,13 @@ export default function Footer() {
                 fill="currentColor"
                 className="footericonsmall active"
                 onClick={toggleRepeat}
+                data-tooltip={
+                  repeatMode === "none"
+                    ? "Enable repeat"
+                    : repeatMode === "one"
+                    ? "Repeat all"
+                    : "Disable repeat"
+                }
               >
                 <path d="M12.97 3.97a.75.75 0 0 1 1.06 0l2.5 2.5a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 1 1-1.06-1.06l1.72-1.72h-3.44a3.75 3.75 0 0 0-3.75 3.75v.75a.75.75 0 0 1-1.5 0v-.75a5.25 5.25 0 0 1 5.25-5.25h3.44l-1.72-1.72a.75.75 0 0 1 0-1.06ZM11.03 20.03a.75.75 0 0 1-1.06 0l-2.5-2.5a.75.75 0 0 1 0-1.06l2.5-2.5a.75.75 0 1 1 1.06 1.06l-1.72 1.72h3.44a3.75 3.75 0 0 0 3.75-3.75v-.75a.75.75 0 0 1 1.5 0v.75a5.25 5.25 0 0 1-5.25 5.25h-3.44l1.72 1.72a.75.75 0 0 1 0 1.06Z" />
                 <text
@@ -200,6 +212,13 @@ export default function Footer() {
                 fill="currentColor"
                 className="footericonsmall active"
                 onClick={toggleRepeat}
+                data-tooltip={
+                  repeatMode === "none"
+                    ? "Enable repeat"
+                    : repeatMode === "one"
+                    ? "Repeat all"
+                    : "Disable repeat"
+                }
               >
                 <path
                   fillRule="evenodd"

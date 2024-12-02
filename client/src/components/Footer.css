@@ -204,3 +204,49 @@
 .mutebutton:hover {
   color: var(--purple);
 }
+
+/* Tooltip styles */
+[data-tooltip] {
+  position: relative;
+  cursor: pointer;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--lightgrey);
+  color: var(--white);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Add delay to tooltip */
+[data-tooltip]:hover::after {
+  animation: tooltipDelay 0.2s;
+}
+
+@keyframes tooltipDelay {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Hide tooltips on mobile */
+@media (max-width: 768px) {
+  [data-tooltip]:hover::after {
+    display: none;
+  }
+}

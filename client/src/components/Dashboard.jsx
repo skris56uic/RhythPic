@@ -71,7 +71,17 @@ export default function Dashboard() {
           <span className="artists">{song.artist}</span>
         </div>
         <div className="song-actions">
-          <button className="dashboardfavouritesbutton">
+          <button
+            className="dashboardfavouritesbutton"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleFavouriteClick(song.id);
+            }}
+            title={
+              song.favourite ? "Remove from favorites" : "Add to favorites"
+            }
+          >
             <svg
               className={
                 `dashboardfavouritesicon` +
@@ -80,28 +90,36 @@ export default function Dashboard() {
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleFavouriteClick(song.id);
-              }}
             >
               <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
             </svg>
           </button>
           <button
-            className="add-to-queue-button"
+            className={`add-to-queue-button ${
+              queuedSongs.some((queuedSong) => queuedSong.id === song.id)
+                ? "in-queue"
+                : ""
+            }`}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               addToQueue(song);
             }}
+            title={
+              queuedSongs.some((queuedSong) => queuedSong.id === song.id)
+                ? "Already in queue"
+                : "Add to queue"
+            }
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              className="queue-icon"
+              className={`queue-icon ${
+                queuedSongs.some((queuedSong) => queuedSong.id === song.id)
+                  ? "in-queue"
+                  : ""
+              }`}
             >
               <path d="M6 3a3 3 0 00-3 3v2.25a3 3 0 003 3h2.25a3 3 0 003-3V6a3 3 0 00-3-3H6zM15.75 3a3 3 0 00-3 3v2.25a3 3 0 003 3H18a3 3 0 003-3V6a3 3 0 00-3-3h-2.25zM6 12.75a3 3 0 00-3 3V18a3 3 0 003 3h2.25a3 3 0 003-3v-2.25a3 3 0 00-3-3H6zM17.625 13.5a.75.75 0 00-1.5 0v2.625H13.5a.75.75 0 000 1.5h2.625v2.625a.75.75 0 001.5 0v-2.625h2.625a.75.75 0 000-1.5h-2.625V13.5z" />
             </svg>
