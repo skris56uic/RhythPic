@@ -184,3 +184,7 @@
 .artists {
   font-size: 0.8rem;
 }
+
+.footericonsmall.active {
+  color: var(--purple);
+}

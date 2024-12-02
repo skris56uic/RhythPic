@@ -6,8 +6,19 @@ import { AppContext } from "../AppContextAndAppContextProvider";
 import "./Footer.css";
 
 export default function Footer() {
-  const { currentSong, setSongProgress, isPlaying, audioRef, togglePlayPause } =
-    useContext(AppContext);
+  const {
+    currentSong,
+    setSongProgress,
+    isPlaying,
+    audioRef,
+    togglePlayPause,
+    playNext,
+    playPrevious,
+    toggleShuffle,
+    toggleRepeat,
+    isShuffle,
+    repeatMode,
+  } = useContext(AppContext);
 
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(100);
@@ -69,7 +80,6 @@ export default function Footer() {
 
           <div className="mediacontrols">
             <svg
-              className="footericonsmall"
               fill="CurrentColor"
               version="1.1"
               id="Ebene_1"
@@ -82,6 +92,8 @@ export default function Footer() {
               xmlSpace="preserve"
               stroke="#e1e1e1"
               strokeWidth="0.5"
+              onClick={toggleShuffle}
+              className={`footericonsmall ${isShuffle ? "active" : ""}`}
             >
               <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
               <g
@@ -104,6 +116,7 @@ export default function Footer() {
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
+              onClick={playPrevious}
             >
               <path d="M9.195 18.44c1.25.714 2.805-.189 2.805-1.629v-2.34l6.945 3.968c1.25.715 2.805-.188 2.805-1.628V8.69c0-1.44-1.555-2.343-2.805-1.628L12 11.029v-2.34c0-1.44-1.555-2.343-2.805-1.628l-7.108 4.061c-1.26.72-1.26 2.536 0 3.256l7.108 4.061Z" />
             </svg>
@@ -141,21 +154,59 @@ export default function Footer() {
               viewBox="0 0 24 24"
               fill="currentColor"
               className="footericon"
+              onClick={playNext}
             >
               <path d="M5.055 7.06C3.805 6.347 2.25 7.25 2.25 8.69v8.122c0 1.44 1.555 2.343 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.343 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256l-7.108-4.061C13.555 6.346 12 7.249 12 8.689v2.34L5.055 7.061Z" />
             </svg>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="footericonsmall"
-            >
-              <path
-                fillRule="evenodd"
-                d="M12 5.25c1.213 0 2.415.046 3.605.135a3.256 3.256 0 0 1 3.01 3.01c.044.583.077 1.17.1 1.759L17.03 8.47a.75.75 0 1 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 0 0-1.06-1.06l-1.752 1.751c-.023-.65-.06-1.296-.108-1.939a4.756 4.756 0 0 0-4.392-4.392 49.422 49.422 0 0 0-7.436 0A4.756 4.756 0 0 0 3.89 8.282c-.017.224-.033.447-.046.672a.75.75 0 1 0 1.497.092c.013-.217.028-.434.044-.651a3.256 3.256 0 0 1 3.01-3.01c1.19-.09 2.392-.135 3.605-.135Zm-6.97 6.22a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.752-1.751c.023.65.06 1.296.108 1.939a4.756 4.756 0 0 0 4.392 4.392 49.413 49.413 0 0 0 7.436 0 4.756 4.756 0 0 0 4.392-4.392c.017-.223.032-.447.046-.672a.75.75 0 0 0-1.497-.092c-.013.217-.028.434-.044.651a3.256 3.256 0 0 1-3.01 3.01 47.953 47.953 0 0 1-7.21 0 3.256 3.256 0 0 1-3.01-3.01 47.759 47.759 0 0 1-.1-1.759L6.97 15.53a.75.75 0 0 0 1.06-1.06l-3-3Z"
-                clipRule="evenodd"
-              />
-            </svg>
+            {repeatMode === "none" ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="footericonsmall"
+                onClick={toggleRepeat}
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M12 5.25c1.213 0 2.415.046 3.605.135a3.256 3.256 0 0 1 3.01 3.01c.044.583.077 1.17.1 1.759L17.03 8.47a.75.75 0 1 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 0 0-1.06-1.06l-1.752 1.751c-.023-.65-.06-1.296-.108-1.939a4.756 4.756 0 0 0-4.392-4.392 49.422 49.422 0 0 0-7.436 0A4.756 4.756 0 0 0 3.89 8.282c-.017.224-.033.447-.046.672a.75.75 0 1 0 1.497.092c.013-.217.028-.434.044-.651a3.256 3.256 0 0 1 3.01-3.01c1.19-.09 2.392-.135 3.605-.135Zm-6.97 6.22a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.752-1.751c.023.65.06 1.296.108 1.939a4.756 4.756 0 0 0 4.392 4.392 49.413 49.413 0 0 0 7.436 0 4.756 4.756 0 0 0 4.392-4.392c.017-.223.032-.447.046-.672a.75.75 0 0 0-1.497-.092c-.013.217-.028.434-.044.651a3.256 3.256 0 0 1-3.01 3.01 47.953 47.953 0 0 1-7.21 0 3.256 3.256 0 0 1-3.01-3.01 47.759 47.759 0 0 1-.1-1.759L6.97 15.53a.75.75 0 0 0 1.06-1.06l-3-3Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            ) : repeatMode === "one" ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="footericonsmall active"
+                onClick={toggleRepeat}
+              >
+                <path d="M12.97 3.97a.75.75 0 0 1 1.06 0l2.5 2.5a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 1 1-1.06-1.06l1.72-1.72h-3.44a3.75 3.75 0 0 0-3.75 3.75v.75a.75.75 0 0 1-1.5 0v-.75a5.25 5.25 0 0 1 5.25-5.25h3.44l-1.72-1.72a.75.75 0 0 1 0-1.06ZM11.03 20.03a.75.75 0 0 1-1.06 0l-2.5-2.5a.75.75 0 0 1 0-1.06l2.5-2.5a.75.75 0 1 1 1.06 1.06l-1.72 1.72h3.44a3.75 3.75 0 0 0 3.75-3.75v-.75a.75.75 0 0 1 1.5 0v.75a5.25 5.25 0 0 1-5.25 5.25h-3.44l1.72 1.72a.75.75 0 0 1 0 1.06Z" />
+                <text
+                  x="12"
+                  y="14"
+                  textAnchor="middle"
+                  fontSize="8"
+                  fill="currentColor"
+                  className="active"
+                >
+                  1
+                </text>
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="footericonsmall active"
+                onClick={toggleRepeat}
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M12 5.25c1.213 0 2.415.046 3.605.135a3.256 3.256 0 0 1 3.01 3.01c.044.583.077 1.17.1 1.759L17.03 8.47a.75.75 0 1 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 0 0-1.06-1.06l-1.752 1.751c-.023-.65-.06-1.296-.108-1.939a4.756 4.756 0 0 0-4.392-4.392 49.422 49.422 0 0 0-7.436 0A4.756 4.756 0 0 0 3.89 8.282c-.017.224-.033.447-.046.672a.75.75 0 1 0 1.497.092c.013-.217.028-.434.044-.651a3.256 3.256 0 0 1 3.01-3.01c1.19-.09 2.392-.135 3.605-.135Zm-6.97 6.22a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.752-1.751c.023.65.06 1.296.108 1.939a4.756 4.756 0 0 0 4.392 4.392 49.413 49.413 0 0 0 7.436 0 4.756 4.756 0 0 0 4.392-4.392c.017-.223.032-.447.046-.672a.75.75 0 0 0-1.497-.092c-.013.217-.028.434-.044.651a3.256 3.256 0 0 1-3.01 3.01 47.953 47.953 0 0 1-7.21 0 3.256 3.256 0 0 1-3.01-3.01 47.759 47.759 0 0 1-.1-1.759L6.97 15.53a.75.75 0 0 0 1.06-1.06l-3-3Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
           </div>
           <div className="volumecontrols">
             <svg
