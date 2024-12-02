@@ -17,6 +17,7 @@ export default function MusicPlayer() {
     loading,
     setLoading,
     audioRef,
+    addToRecentlyPlayed,
   } = useContext(AppContext);
   const { songid } = useParams();
 
@@ -69,7 +70,9 @@ export default function MusicPlayer() {
 
           setAllSongs(newAllSongs);
 
-          setCurrentSong(newAllSongs.find((song) => song.id === songid));
+          const updatedSong = newAllSongs.find((song) => song.id === songid);
+          setCurrentSong(updatedSong);
+          addToRecentlyPlayed(updatedSong);
 
           audioRef.current.src = `${base_url}/audio?id=${songid}`;
           audioRef.current.load();
@@ -78,7 +81,11 @@ export default function MusicPlayer() {
         } else {
           console.log("data already in app, no need to fetch from server");
 
-          setCurrentSong(allSongs.find((song) => song.id === songid));
+          setCurrentSong(song);
+          addToRecentlyPlayed(song);
+
+          audioRef.current.src = `${base_url}/audio?id=${songid}`;
+          audioRef.current.load();
 
           setLoading(null);
         }
