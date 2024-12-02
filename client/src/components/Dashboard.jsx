@@ -17,6 +17,7 @@ export default function Dashboard() {
     addToQueue,
     removeFromQueue,
     playQueuedSong,
+    recentlyPlayed,
   } = useContext(AppContext);
 
   function handleFavouriteClick(songId) {
@@ -55,70 +56,57 @@ export default function Dashboard() {
     removeFromQueue(songId);
   }
 
-  function generateSongTiles(from = 0, to = 5) {
-    const generatedSongTiles = [];
-    for (let i = from; i < to; i++) {
-      generatedSongTiles.push(
-        <Link
-          to={`/musicplayer/${allSongs[i].id}`}
-          key={allSongs[i].id}
-          className="songtile"
-        >
-          <img
-            className="songimages"
-            src={allSongs[i].album_art_url}
-            alt={`${allSongs[i].name}\n${allSongs[i].artist}`}
-          />
-
-          <div className="songdetails">
-            <span className="songname">{allSongs[i].name}</span>
-            <span className="artists">{allSongs[i].artist}</span>
-          </div>
-
-          <div className="song-actions">
-            <button className="dashboardfavouritesbutton">
-              <svg
-                className={
-                  `dashboardfavouritesicon` +
-                  (allSongs[i].favourite
-                    ? " dashboardfavouritesiconactive"
-                    : "")
-                }
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleFavouriteClick(allSongs[i].id);
-                }}
-              >
-                <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
-              </svg>
-            </button>
-            <button
-              className="add-to-queue-button"
+  function generateSongTiles(songs) {
+    return songs.map((song) => (
+      <Link to={`/musicplayer/${song.id}`} key={song.id} className="songtile">
+        <img
+          className="songimages"
+          src={song.album_art_url}
+          alt={`${song.name}\n${song.artist}`}
+        />
+        <div className="songdetails">
+          <span className="songname">{song.name}</span>
+          <span className="artists">{song.artist}</span>
+        </div>
+        <div className="song-actions">
+          <button className="dashboardfavouritesbutton">
+            <svg
+              className={
+                `dashboardfavouritesicon` +
+                (song.favourite ? " dashboardfavouritesiconactive" : "")
+              }
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                addToQueue(allSongs[i]);
+                handleFavouriteClick(song.id);
               }}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="queue-icon"
-              >
-                <path d="M6 3a3 3 0 00-3 3v2.25a3 3 0 003 3h2.25a3 3 0 003-3V6a3 3 0 00-3-3H6zM15.75 3a3 3 0 00-3 3v2.25a3 3 0 003 3H18a3 3 0 003-3V6a3 3 0 00-3-3h-2.25zM6 12.75a3 3 0 00-3 3V18a3 3 0 003 3h2.25a3 3 0 003-3v-2.25a3 3 0 00-3-3H6zM17.625 13.5a.75.75 0 00-1.5 0v2.625H13.5a.75.75 0 000 1.5h2.625v2.625a.75.75 0 001.5 0v-2.625h2.625a.75.75 0 000-1.5h-2.625V13.5z" />
-              </svg>
-            </button>
-          </div>
-        </Link>
-      );
-    }
-
-    return generatedSongTiles;
+              <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+            </svg>
+          </button>
+          <button
+            className="add-to-queue-button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              addToQueue(song);
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="queue-icon"
+            >
+              <path d="M6 3a3 3 0 00-3 3v2.25a3 3 0 003 3h2.25a3 3 0 003-3V6a3 3 0 00-3-3H6zM15.75 3a3 3 0 00-3 3v2.25a3 3 0 003 3H18a3 3 0 003-3V6a3 3 0 00-3-3h-2.25zM6 12.75a3 3 0 00-3 3V18a3 3 0 003 3h2.25a3 3 0 003-3v-2.25a3 3 0 00-3-3H6zM17.625 13.5a.75.75 0 00-1.5 0v2.625H13.5a.75.75 0 000 1.5h2.625v2.625a.75.75 0 001.5 0v-2.625h2.625a.75.75 0 000-1.5h-2.625V13.5z" />
+            </svg>
+          </button>
+        </div>
+      </Link>
+    ));
   }
 
   function generateQueueListItems() {
@@ -176,11 +164,16 @@ export default function Dashboard() {
         >
           <div className="playlists">
             <h2>Recently Played</h2>
-
-            <div className="songlist"></div>
+            <div className="songlist">
+              {recentlyPlayed.length > 0 ? (
+                generateSongTiles(recentlyPlayed)
+              ) : (
+                <div>No recently played songs</div>
+              )}
+            </div>
             <h2>All Songs</h2>
             <div className="songlist">
-              {allSongs.length && generateSongTiles(0, allSongs.length)}
+              {allSongs.length && generateSongTiles(allSongs)}
             </div>
           </div>
           <div className="queuedsongs">

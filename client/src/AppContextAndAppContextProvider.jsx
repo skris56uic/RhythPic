@@ -14,12 +14,49 @@ const AppContextProvider = ({ children }) => {
     const savedQueue = localStorage.getItem("songQueue");
     return savedQueue ? JSON.parse(savedQueue) : [];
   });
+  const [recentlyPlayed, setRecentlyPlayed] = useState(() => {
+    const saved = localStorage.getItem("recentlyPlayed");
+    return saved ? JSON.parse(saved) : [];
+  });
   const audioRef = useRef(new Audio());
 
-  // Save queue to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("songQueue", JSON.stringify(queuedSongs));
   }, [queuedSongs]);
+
+  useEffect(() => {
+    try {
+      // Only store essential song data
+      const essentialData = recentlyPlayed.map((song) => ({
+        id: song.id,
+        name: song.name,
+        artist: song.artist,
+        album_art_url: song.album_art_url,
+        favourite: song.favourite,
+      }));
+      localStorage.setItem("recentlyPlayed", JSON.stringify(essentialData));
+    } catch (error) {
+      console.error("Error saving to localStorage:", error);
+      // If storage fails, keep the state but don't crash
+    }
+  }, [recentlyPlayed]);
+
+  const addToRecentlyPlayed = (song) => {
+    if (!song) return;
+    setRecentlyPlayed((prev) => {
+      // Create minimal song object
+      const minimalSong = {
+        id: song.id,
+        name: song.name,
+        artist: song.artist,
+        album_art_url: song.album_art_url,
+        favourite: song.favourite,
+      };
+      const filtered = prev.filter((s) => s.id !== song.id);
+      const updated = [minimalSong, ...filtered].slice(0, 5);
+      return updated;
+    });
+  };
 
   const addToQueue = (song) => {
     if (!queuedSongs.some((queuedSong) => queuedSong.id === song.id)) {
@@ -48,12 +85,10 @@ const AppContextProvider = ({ children }) => {
     try {
       setLoading({ text: "Loading Song..." });
 
-      // If song details aren't loaded yet, fetch them
       if (!song.lyricsAndImages) {
         const lyrics = await fetchSongLyrics(song.id);
         const trivia = await fetchSongTrivia(lyrics.fileName);
 
-        // Update the song in allSongs with the new data
         const updatedSongs = allSongs.map((s) =>
           s.id === song.id
             ? {
@@ -65,12 +100,11 @@ const AppContextProvider = ({ children }) => {
             : s
         );
         setAllSongs(updatedSongs);
-
-        // Update the current song with the fetched data
         song = updatedSongs.find((s) => s.id === song.id);
       }
 
       setCurrentSong(song);
+      addToRecentlyPlayed(song);
       audioRef.current.src = `${base_url}/audio?id=${song.id}`;
       await audioRef.current.load();
       await audioRef.current.play();
@@ -103,6 +137,8 @@ const AppContextProvider = ({ children }) => {
         removeFromQueue,
         clearQueue,
         playQueuedSong,
+        recentlyPlayed,
+        addToRecentlyPlayed,
       }}
     >
       {children}
