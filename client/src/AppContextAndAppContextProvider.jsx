@@ -20,22 +20,16 @@ const AppContextProvider = ({ children }) => {
   });
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState("none");
-  const [audioState, setAudioState] = useState({
-    source: "",
-    isLoading: false,
-    error: null,
-  });
-
   const [volume, setVolume] = useState(() => {
     const savedVolume = localStorage.getItem("volume");
     return savedVolume ? Number(savedVolume) : 100;
   });
 
   const audioRef = useRef();
+  const shuffledSongsRef = useRef([]);
 
   useEffect(() => {
     audioRef.current = new Audio();
-    // Set initial volume from localStorage
     const savedVolume = localStorage.getItem("volume");
     audioRef.current.volume = savedVolume ? Number(savedVolume) / 100 : 1;
 
@@ -53,46 +47,13 @@ const AppContextProvider = ({ children }) => {
   }, [volume]);
 
   useEffect(() => {
-    if (audioState.source) {
-      const loadAudio = async () => {
-        try {
-          audioRef.current.src = audioState.source;
-          await audioRef.current.load();
-          await audioRef.current.play();
-          setIsPlaying(true);
-          setAudioState((prev) => ({ ...prev, isLoading: false }));
-          setLoading(null);
-        } catch (error) {
-          setAudioState((prev) => ({ ...prev, error, isLoading: false }));
-          setIsPlaying(false);
-          setLoading(null);
-        }
-      };
-
-      setAudioState((prev) => ({ ...prev, isLoading: true }));
-      loadAudio();
+    if (isShuffle && allSongs) {
+      // Create a new shuffled array when shuffle is enabled
+      shuffledSongsRef.current = [...allSongs].sort(() => Math.random() - 0.5);
     }
-  }, [audioState.source]);
+  }, [isShuffle, allSongs]);
 
-  useEffect(() => {
-    localStorage.setItem("songQueue", JSON.stringify(queuedSongs));
-  }, [queuedSongs]);
-
-  useEffect(() => {
-    try {
-      const essentialData = recentlyPlayed.map((song) => ({
-        id: song.id,
-        name: song.name,
-        artist: song.artist,
-        album_art_url: song.album_art_url,
-        favourite: song.favourite,
-      }));
-      localStorage.setItem("recentlyPlayed", JSON.stringify(essentialData));
-    } catch (error) {
-      console.error("Error saving to localStorage:", error);
-    }
-  }, [recentlyPlayed]);
-
+  // Other utility functions remain the same
   const addToRecentlyPlayed = (song) => {
     if (!song) return;
     setRecentlyPlayed((prev) => {
@@ -133,28 +94,61 @@ const AppContextProvider = ({ children }) => {
   };
 
   const toggleShuffle = () => {
-    setIsShuffle(!isShuffle);
+    setIsShuffle((prev) => !prev);
   };
 
   const toggleMute = () => {
     setVolume((prev) => (prev === 0 ? 100 : 0));
   };
 
-  const getRandomSong = () => {
-    if (allSongs) {
-      const randomIndex = Math.floor(Math.random() * allSongs.length);
-      return allSongs[randomIndex];
+  const getNextSong = () => {
+    if (queuedSongs.length > 0) {
+      return queuedSongs[0];
     }
-    return null;
+
+    if (!currentSong || !allSongs) return null;
+
+    if (isShuffle) {
+      const currentShuffleIndex = shuffledSongsRef.current.findIndex(
+        (song) => song.id === currentSong.id
+      );
+      const nextIndex =
+        (currentShuffleIndex + 1) % shuffledSongsRef.current.length;
+      return shuffledSongsRef.current[nextIndex];
+    }
+
+    const currentIndex = allSongs.findIndex(
+      (song) => song.id === currentSong.id
+    );
+    const nextIndex = (currentIndex + 1) % allSongs.length;
+    return allSongs[nextIndex];
   };
 
-  const toggleRepeat = () => {
-    const modes = ["none", "one", "all"];
-    const currentIndex = modes.indexOf(repeatMode);
-    setRepeatMode(modes[(currentIndex + 1) % modes.length]);
+  const getPreviousSong = () => {
+    if (!currentSong || !allSongs) return null;
+
+    if (isShuffle) {
+      const currentShuffleIndex = shuffledSongsRef.current.findIndex(
+        (song) => song.id === currentSong.id
+      );
+      const prevIndex =
+        currentShuffleIndex === 0
+          ? shuffledSongsRef.current.length - 1
+          : currentShuffleIndex - 1;
+      return shuffledSongsRef.current[prevIndex];
+    }
+
+    const currentIndex = allSongs.findIndex(
+      (song) => song.id === currentSong.id
+    );
+    const prevIndex =
+      currentIndex === 0 ? allSongs.length - 1 : currentIndex - 1;
+    return allSongs[prevIndex];
   };
 
   const playSong = async (song) => {
+    if (!song) return false;
+
     try {
       setLoading({ text: "Loading Song..." });
 
@@ -181,29 +175,13 @@ const AppContextProvider = ({ children }) => {
         song = updatedSong;
       }
 
-      // Set audio source first
       audioRef.current.src = `${base_url}/audio?id=${song.id}`;
 
-      // Wait for audio to be loaded
-      await new Promise((resolve, reject) => {
-        audioRef.current.onloadeddata = () => {
-          resolve();
-        };
-        audioRef.current.onerror = (e) => {
-          console.error("Audio load error:", e);
-          reject(e);
-        };
-        audioRef.current.load();
-      });
-
-      // Update states after audio is loaded
+      await audioRef.current.load();
       setCurrentSong(song);
       addToRecentlyPlayed(song);
-
-      // Play the audio
       await audioRef.current.play();
       setIsPlaying(true);
-
       setLoading(null);
       return true;
     } catch (error) {
@@ -215,58 +193,17 @@ const AppContextProvider = ({ children }) => {
 
   const playNext = async () => {
     try {
-      // If repeat one is enabled, replay current song
       if (repeatMode === "one") {
-        await playSong(currentSong, false);
+        audioRef.current.currentTime = 0;
+        await audioRef.current.play();
         return;
       }
 
-      if (isShuffle) {
-        const randomSong = getRandomSong();
-        if (randomSong) {
-          await playSong(randomSong);
-        }
-        return;
-      }
-
-      // Check if current song is in queue
-      const currentQueueIndex = queuedSongs.findIndex(
-        (s) => s.id === currentSong?.id
-      );
-
-      if (queuedSongs.length > 0) {
-        let nextSong;
-        let newQueue;
-
-        if (currentQueueIndex === -1) {
-          // Current song not in queue, play first queued song
-          nextSong = queuedSongs[0];
-          newQueue = queuedSongs.slice(1);
-        } else if (currentQueueIndex + 1 < queuedSongs.length) {
-          // Play next song in queue
-          nextSong = queuedSongs[currentQueueIndex + 1];
-          newQueue = queuedSongs.slice(currentQueueIndex + 1);
-        } else {
-          // End of queue reached, find current song in all songs and play next
-          const currentAllSongsIndex = allSongs.findIndex(
-            (s) => s.id === currentSong.id
-          );
-          const nextIndex = (currentAllSongsIndex + 1) % allSongs.length;
-          nextSong = allSongs[nextIndex];
-          newQueue = [];
-        }
-
-        const success = await playSong(nextSong, true);
-        if (success) {
-          setQueuedSongs(newQueue);
-        }
-      } else {
-        // No queue, play from all songs
-        const currentIndex = allSongs.findIndex((s) => s.id === currentSong.id);
-        if (currentIndex > -1) {
-          // Always go to next song, wrapping around to beginning if at end
-          const nextIndex = (currentIndex + 1) % allSongs.length;
-          await playSong(allSongs[nextIndex], false);
+      const nextSong = getNextSong();
+      if (nextSong) {
+        const success = await playSong(nextSong);
+        if (success && queuedSongs.length > 0) {
+          setQueuedSongs(queuedSongs.slice(1));
         }
       }
     } catch (error) {
@@ -277,13 +214,8 @@ const AppContextProvider = ({ children }) => {
 
   const playPrevious = async () => {
     try {
-      // Check if current song is in queue
-      const currentQueueIndex = queuedSongs.findIndex(
-        (s) => s.id === currentSong?.id
-      );
-
-      if (currentQueueIndex !== -1 || queuedSongs.length > 0) {
-        // If song is in queue or queue exists, just restart current song
+      if (audioRef.current.currentTime > 3) {
+        // If more than 3 seconds into the song, restart it
         audioRef.current.currentTime = 0;
         if (!isPlaying) {
           await audioRef.current.play();
@@ -292,18 +224,20 @@ const AppContextProvider = ({ children }) => {
         return;
       }
 
-      // If not in queue, handle navigation through all songs list
-      const currentIndex = allSongs.findIndex((s) => s.id === currentSong.id);
-      if (currentIndex > -1) {
-        // If it's the first song, go to the last song
-        const prevIndex =
-          currentIndex === 0 ? allSongs.length - 1 : currentIndex - 1;
-        await playSong(allSongs[prevIndex], false);
+      const previousSong = getPreviousSong();
+      if (previousSong) {
+        await playSong(previousSong);
       }
     } catch (error) {
       console.error("Error in playPrevious:", error);
       setLoading(null);
     }
+  };
+
+  const toggleRepeat = () => {
+    const modes = ["none", "one", "all"];
+    const currentIndex = modes.indexOf(repeatMode);
+    setRepeatMode(modes[(currentIndex + 1) % modes.length]);
   };
 
   useEffect(() => {
@@ -324,8 +258,9 @@ const AppContextProvider = ({ children }) => {
         }
       };
     }
-  }, [repeatMode, currentSong]);
+  }, [repeatMode, currentSong, queuedSongs]);
 
+  // Context value remains the same
   return (
     <AppContext.Provider
       value={{
