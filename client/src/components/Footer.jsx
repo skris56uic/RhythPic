@@ -55,7 +55,7 @@ export default function Footer() {
           }}
         />
         <div className="allcontrols">
-          <Link to="/musicplayer" className="songinfo">
+          <Link to={`/musicplayer/` + currentSong.id} className="songinfo">
             <img
               className="albumcover"
               src={currentSong.album_art_url}
