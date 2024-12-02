@@ -188,3 +188,19 @@
 .footericonsmall.active {
   color: var(--purple);
 }
+
+.mutebutton {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--white);
+  cursor: pointer;
+  transition: color 0.33s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mutebutton:hover {
+  color: var(--purple);
+}

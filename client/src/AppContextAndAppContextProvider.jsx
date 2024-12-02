@@ -26,11 +26,16 @@ const AppContextProvider = ({ children }) => {
     error: null,
   });
 
+  const [volume, setVolume] = useState(() => {
+    const savedVolume = localStorage.getItem("volume");
+    return savedVolume ? Number(savedVolume) : 100;
+  });
+
   const audioRef = useRef();
 
   useEffect(() => {
     audioRef.current = new Audio();
-    // Set initial volume from localStorage or default to 100%
+    // Set initial volume from localStorage
     const savedVolume = localStorage.getItem("volume");
     audioRef.current.volume = savedVolume ? Number(savedVolume) / 100 : 1;
 
@@ -39,6 +44,13 @@ const AppContextProvider = ({ children }) => {
       audioRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
+      localStorage.setItem("volume", volume.toString());
+    }
+  }, [volume]);
 
   useEffect(() => {
     if (audioState.source) {
@@ -122,6 +134,10 @@ const AppContextProvider = ({ children }) => {
 
   const toggleShuffle = () => {
     setIsShuffle(!isShuffle);
+  };
+
+  const toggleMute = () => {
+    setVolume((prev) => (prev === 0 ? 100 : 0));
   };
 
   const getRandomSong = () => {
@@ -338,6 +354,9 @@ const AppContextProvider = ({ children }) => {
         isShuffle,
         toggleRepeat,
         repeatMode,
+        volume,
+        setVolume,
+        toggleMute,
       }}
     >
       {children}

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 
@@ -18,17 +19,12 @@ export default function Footer() {
     toggleRepeat,
     isShuffle,
     repeatMode,
+    volume,
+    setVolume,
+    toggleMute,
   } = useContext(AppContext);
 
   const [progress, setProgress] = useState(0);
-  const [volume, setVolume] = useState(() => {
-    const savedVolume = localStorage.getItem("volume");
-    // Initialize audio volume with saved value or default to 100
-    if (audioRef.current) {
-      audioRef.current.volume = savedVolume ? Number(savedVolume) / 100 : 1;
-    }
-    return savedVolume ? Number(savedVolume) : 100;
-  });
 
   useEffect(() => {
     if (currentSong) {
@@ -47,8 +43,6 @@ export default function Footer() {
   const handleVolumeChange = (e) => {
     const value = Number(e.target.value);
     setVolume(value);
-    audioRef.current.volume = value / 100;
-    localStorage.setItem("volume", value.toString());
   };
 
   const handleProgressChange = (e) => {
@@ -85,7 +79,6 @@ export default function Footer() {
               <span className="artists">{currentSong.artist}</span>
             </div>
           </Link>
-
           <div className="mediacontrols">
             <svg
               fill="CurrentColor"
@@ -217,24 +210,95 @@ export default function Footer() {
             )}
           </div>
           <div className="volumecontrols">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="footericon"
+            <button
+              className="mutebutton"
+              onClick={toggleMute}
+              aria-label={volume === 0 ? "Unmute" : "Mute"}
             >
-              <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 0 0 1.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06ZM18.584 5.106a.75.75 0 0 1 1.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 0 1-1.06-1.06 8.25 8.25 0 0 0 0-11.668.75.75 0 0 1 0-1.06Z" />
-              <path d="M15.932 7.757a.75.75 0 0 1 1.061 0 6 6 0 0 1 0 8.486.75.75 0 0 1-1.06-1.061 4.5 4.5 0 0 0 0-6.364.75.75 0 0 1 0-1.06Z" />
-            </svg>
+              {volume === 0 ? (
+                <svg
+                  className="footericon"
+                  enable-background="new 0 0 50 50"
+                  height="50px"
+                  id="Layer_1"
+                  version="1.1"
+                  viewBox="0 0 50 50"
+                  width="50px"
+                  xml:space="preserve"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                >
+                  <line
+                    fill="none"
+                    stroke="#bb6bfc"
+                    stroke-linecap="round"
+                    stroke-miterlimit="10"
+                    stroke-width="2"
+                    x1="32"
+                    x2="42"
+                    y1="20"
+                    y2="30"
+                  />
+                  <line
+                    fill="none"
+                    stroke="#bb6bfc"
+                    stroke-linecap="round"
+                    stroke-miterlimit="10"
+                    stroke-width="2"
+                    x1="42"
+                    x2="32"
+                    y1="20"
+                    y2="30"
+                  />
+                  <rect fill="none" height="50" width="50" />
+                  <rect fill="none" height="50" width="50" />
+                  <path
+                    d="M10,33H3  c-1.103,0-2-0.898-2-2V19c0-1.102,0.897-2,2-2h7"
+                    fill="none"
+                    stroke="#bb6bfc"
+                    stroke-linejoin="round"
+                    stroke-miterlimit="10"
+                    stroke-width="2.08"
+                  />
+                  <path
+                    d="M9.604,32.43  C9.256,32.129,9,31.391,9,30.754V19.247c0-0.637,0.256-1.388,0.604-1.689L22.274,4.926C23.905,3.27,26,3.898,26,6.327v36.988  c0,2.614-1.896,3.604-3.785,1.686L9.604,32.43z"
+                    fill="none"
+                    stroke="#bb6bfc"
+                    stroke-linejoin="round"
+                    stroke-miterlimit="10"
+                    stroke-width="1.9797"
+                  />
+                </svg>
+              ) : volume > 50 ? (
+                <svg
+                  className="footericon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 0 0 1.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06ZM18.584 5.106a.75.75 0 0 1 1.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 0 1-1.06-1.06 8.25 8.25 0 0 0 0-11.668.75.75 0 0 1 0-1.06Z" />
+                  <path d="M15.932 7.757a.75.75 0 0 1 1.061 0 6 6 0 0 1 0 8.486.75.75 0 0 1-1.06-1.061 4.5 4.5 0 0 0 0-6.364.75.75 0 0 1 0-1.06Z" />
+                </svg>
+              ) : (
+                <svg
+                  className="footericon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 0 0 1.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06ZM15.932 7.757a.75.75 0 0 1 1.061 0 6 6 0 0 1 0 8.486.75.75 0 0 1-1.06-1.061 4.5 4.5 0 0 0 0-6.364.75.75 0 0 1 0-1.06Z" />
+                </svg>
+              )}
+            </button>
             <input
               className="slider"
               type="range"
-              min="1"
+              min="0"
               max="100"
               value={volume}
               onInput={handleVolumeChange}
               style={{
-                background: `linear-gradient(to right, #bb6bfc ${volume}%, #e1e1e1 ${volume}%)`,
+                background: `linear-gradient(to right, var(--purple) ${volume}%, var(--lightgrey) ${volume}%)`,
               }}
             />
           </div>
