@@ -28,6 +28,21 @@ export default function Dashboard() {
     });
 
     setAllSongs(updatedSongs);
+
+    if (localStorage.getItem("favourites")) {
+      const favourites = JSON.parse(localStorage.getItem("favourites"));
+      if (favourites.includes(songId)) {
+        const updatedFavourites = favourites.filter((id) => id !== songId);
+        localStorage.setItem("favourites", JSON.stringify(updatedFavourites));
+      } else {
+        localStorage.setItem(
+          "favourites",
+          JSON.stringify([...favourites, songId])
+        );
+      }
+    } else {
+      localStorage.setItem("favourites", JSON.stringify([songId]));
+    }
   }
 
   async function handleQueueItemClick(song) {
@@ -162,45 +177,10 @@ export default function Dashboard() {
           <div className="playlists">
             <h2>Recently Played</h2>
 
-            <div className="songlist">
-              {allSongs.length &&
-                generateSongTiles(0, parseInt(allSongs.length / 4))}
-              <div className="emptysongtile">
-                <svg
-                  className="tileicon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            </div>
+            <div className="songlist"></div>
             <h2>All Songs</h2>
             <div className="songlist">
-              {allSongs.length &&
-                generateSongTiles(
-                  parseInt(allSongs.length / 4) + 1,
-                  parseInt(allSongs.length)
-                )}
-              <div className="emptysongtile">
-                <svg
-                  className="tileicon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
+              {allSongs.length && generateSongTiles(0, allSongs.length)}
             </div>
           </div>
           <div className="queuedsongs">
