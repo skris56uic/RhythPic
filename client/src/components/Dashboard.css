@@ -226,3 +226,10 @@
   font-weight: bold;
   border-bottom: 1px solid var(--black);
 }
+
+.no-songs {
+  padding: 16px;
+  color: #aaa;
+  font-size: 0.9rem;
+  text-align: center;
+}
