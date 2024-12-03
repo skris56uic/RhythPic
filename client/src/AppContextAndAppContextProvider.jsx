@@ -311,7 +311,10 @@ const AppContextProvider = ({ children }) => {
     if (loadingRef.current) return;
 
     setQueuedSongs((prev) => prev.filter((s) => s.id !== song.id));
-    await loadAndPlaySong(song);
+    const success = await loadAndPlaySong(song);
+    if (success) {
+      setIsPlaying(true);
+    }
   };
 
   return (

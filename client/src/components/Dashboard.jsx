@@ -50,9 +50,7 @@ export default function Dashboard() {
   }
 
   async function handleQueueItemClick(song) {
-    if (!song) return;
     await playQueuedSong(song);
-    setIsPlaying(false);
     navigate(`/musicplayer/${song.id}`);
   }
 
