@@ -3,7 +3,6 @@ import { SongDetails, SongDetailsModel, SongFactModel } from "../models/songs";
 import path from "path";
 import fs from "fs";
 
-
 const router: Router = express.Router();
 
 router.get("/songs", (req, res) => {
@@ -123,8 +122,9 @@ router.get("/songFact", async (req, res) => {
 
     const detailsData = await detailsResponse.json();
 
-    const description = detailsData.response.song.description?.plain || "Unable to Fetch any Facts";
-
+    const description: string =
+      detailsData.response.song.description?.plain ||
+      "Unable to Fetch any Facts";
     // Only store in database if we got a real fact
     if (description !== "Unable to Fetch any Facts") {
       await SongFactModel.create({
@@ -134,7 +134,10 @@ router.get("/songFact", async (req, res) => {
       });
     }
 
-    res.json({ description });
+    res.json({
+      description:
+        description.length > 1 ? description : "Unable to Fetch any Facts",
+    });
   } catch (error) {
     console.error("Error fetching song fact:", error);
     res.status(500).send("Error fetching song fact");
