@@ -158,9 +158,7 @@ const AppContextProvider = ({ children }) => {
     // Handle repeat modes
     if (currentIndex === allSongs.length - 1) {
       // If at end of playlist
-      if (repeatMode === "all") {
-        return allSongs[0]; // Go back to start
-      } else if (repeatMode === "one") {
+      if (repeatMode !== "none") {
         return currentSong; // Repeat current song
       }
       return null; // Stop playing
