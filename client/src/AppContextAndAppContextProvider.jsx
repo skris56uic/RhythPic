@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { createContext, useState, useRef, useEffect } from "react";
 import { base_url, fetchSongLyrics, fetchSongTrivia } from "./api/api";
 
@@ -14,6 +15,8 @@ const AppContextProvider = ({ children }) => {
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState("none"); // none, one, all
   const [volume, setVolume] = useState(50);
+  const [shuffleHistory, setShuffleHistory] = useState([]);
+  const [shuffleQueue, setShuffleQueue] = useState([]);
   const audioRef = useRef(new Audio());
   const loadingRef = useRef(false);
 
@@ -106,47 +109,114 @@ const AppContextProvider = ({ children }) => {
     }
   };
 
-  const playQueuedSong = async (song) => {
-    if (loadingRef.current) return;
+  const getNextSong = () => {
+    if (!currentSong || !allSongs) return null;
 
-    setQueuedSongs((prev) => prev.filter((s) => s.id !== song.id));
-    await loadAndPlaySong(song);
+    // First priority: Queued songs
+    if (queuedSongs.length > 0) {
+      return queuedSongs[0];
+    }
+
+    const currentIndex = allSongs.findIndex(
+      (song) => song.id === currentSong.id
+    );
+
+    // Handle shuffle mode
+    if (isShuffle) {
+      // If shuffle queue is empty, generate new shuffled queue excluding current song
+      if (shuffleQueue.length === 0) {
+        const availableSongs = allSongs.filter(
+          (song) => song.id !== currentSong.id
+        );
+        const newShuffleQueue = [...availableSongs].sort(
+          () => Math.random() - 0.5
+        );
+        setShuffleQueue(newShuffleQueue);
+        setShuffleHistory([currentSong]);
+        return newShuffleQueue[0];
+      }
+      return shuffleQueue[0];
+    }
+
+    // Handle repeat modes
+    if (currentIndex === allSongs.length - 1) {
+      // If at end of playlist
+      if (repeatMode === "all") {
+        return allSongs[0]; // Go back to start
+      } else if (repeatMode === "one") {
+        return currentSong; // Repeat current song
+      }
+      return null; // Stop playing
+    }
+
+    // Normal next song
+    return allSongs[currentIndex + 1];
+  };
+
+  const getPreviousSong = () => {
+    if (!currentSong || !allSongs) return null;
+
+    const currentIndex = allSongs.findIndex(
+      (song) => song.id === currentSong.id
+    );
+
+    // Handle shuffle mode
+    if (isShuffle) {
+      if (shuffleHistory.length > 1) {
+        const previousSong = shuffleHistory[shuffleHistory.length - 2];
+        setShuffleHistory((prev) => prev.slice(0, -1));
+        setShuffleQueue((prev) => [currentSong, ...prev]);
+        return previousSong;
+      }
+      // If no history, get random song
+      const availableSongs = allSongs.filter(
+        (song) => song.id !== currentSong.id
+      );
+      return availableSongs[Math.floor(Math.random() * availableSongs.length)];
+    }
+
+    // Handle repeat modes
+    if (currentIndex === 0) {
+      // If at start of playlist
+      if (repeatMode === "all") {
+        return allSongs[allSongs.length - 1]; // Go to end
+      } else if (repeatMode === "one") {
+        return currentSong; // Repeat current song
+      }
+      return null; // Stay on first song
+    }
+
+    // Normal previous song
+    return allSongs[currentIndex - 1];
   };
 
   const playNext = async () => {
     if (!currentSong || !allSongs || loadingRef.current) return;
 
-    const currentIndex = allSongs.findIndex(
-      (song) => song.id === currentSong.id
-    );
-    let nextSong;
+    const nextSong = getNextSong();
+    if (!nextSong) return;
 
+    // Update shuffle history if in shuffle mode
+    if (isShuffle) {
+      setShuffleHistory((prev) => [...prev, nextSong]);
+      setShuffleQueue((prev) => prev.slice(1));
+    }
+
+    // Remove from queue if it was a queued song
     if (queuedSongs.length > 0) {
-      nextSong = queuedSongs[0];
       setQueuedSongs((prev) => prev.slice(1));
-    } else {
-      const nextIndex = (currentIndex + 1) % allSongs.length;
-      nextSong = allSongs[nextIndex];
     }
 
-    if (nextSong) {
-      await loadAndPlaySong(nextSong);
-    }
+    await loadAndPlaySong(nextSong);
   };
 
   const playPrevious = async () => {
     if (!currentSong || !allSongs || loadingRef.current) return;
 
-    const currentIndex = allSongs.findIndex(
-      (song) => song.id === currentSong.id
-    );
-    const prevIndex =
-      currentIndex === 0 ? allSongs.length - 1 : currentIndex - 1;
-    const prevSong = allSongs[prevIndex];
+    const prevSong = getPreviousSong();
+    if (!prevSong) return;
 
-    if (prevSong) {
-      await loadAndPlaySong(prevSong);
-    }
+    await loadAndPlaySong(prevSong);
   };
 
   const togglePlayPause = async () => {
@@ -167,7 +237,22 @@ const AppContextProvider = ({ children }) => {
   };
 
   const toggleShuffle = () => {
-    setIsShuffle((prev) => !prev);
+    setIsShuffle((prev) => {
+      const newValue = !prev;
+      if (newValue) {
+        // Starting shuffle mode
+        setShuffleHistory([currentSong]);
+        const availableSongs = allSongs.filter(
+          (song) => song.id !== currentSong.id
+        );
+        setShuffleQueue([...availableSongs].sort(() => Math.random() - 0.5));
+      } else {
+        // Ending shuffle mode
+        setShuffleHistory([]);
+        setShuffleQueue([]);
+      }
+      return newValue;
+    });
   };
 
   const toggleRepeat = () => {
@@ -200,16 +285,14 @@ const AppContextProvider = ({ children }) => {
       if (repeatMode === "one") {
         audioRef.current.currentTime = 0;
         await audioRef.current.play();
-      } else if (repeatMode === "all" || queuedSongs.length > 0) {
-        await playNext();
       } else {
-        setIsPlaying(false);
+        await playNext();
       }
     };
 
     audioRef.current.addEventListener("ended", handleSongEnd);
     return () => audioRef.current.removeEventListener("ended", handleSongEnd);
-  }, [repeatMode, queuedSongs]);
+  }, [repeatMode]);
 
   useEffect(() => {
     audioRef.current.volume = volume / 100;
@@ -223,6 +306,13 @@ const AppContextProvider = ({ children }) => {
       }
     };
   }, []);
+
+  const playQueuedSong = async (song) => {
+    if (loadingRef.current) return;
+
+    setQueuedSongs((prev) => prev.filter((s) => s.id !== song.id));
+    await loadAndPlaySong(song);
+  };
 
   return (
     <AppContext.Provider
