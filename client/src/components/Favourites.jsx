@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { AppContext } from "../AppContextAndAppContextProvider";
 import Loader from "./Loader";
 
-import "./favourites.css";
+import "./Favourites.css";
 
 export default function Favourites() {
   const { allSongs, setAllSongs, currentSong, loading } =
