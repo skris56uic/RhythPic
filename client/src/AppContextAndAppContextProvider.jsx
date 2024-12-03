@@ -32,17 +32,25 @@ const AppContextProvider = ({ children }) => {
 
   const addToQueue = (song) => {
     setQueuedSongs((prev) => {
-      const updatedQueue = prev.some((queuedSong) => queuedSong.id === song.id)
-        ? prev
-        : [...prev, song];
+      console.log("setQueuedSongs", prev);
+      const isSongInQueue = prev.some(
+        (queuedSong) => queuedSong.id === song.id
+      );
+      if (isSongInQueue) {
+        return prev; // If the song is already in the queue, return the previous state
+      }
+      const updatedQueue = [...prev, song];
+      console.log("setItem from addToQueue");
       localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
       return updatedQueue;
     });
   };
 
   const removeFromQueue = (songId) => {
+    console.log("removeFromQueue");
     setQueuedSongs((prev) => {
       const updatedQueue = prev.filter((song) => song.id !== songId);
+      console.log("setItem from removeFromQueue");
       localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
       return updatedQueue;
     });
@@ -122,6 +130,7 @@ const AppContextProvider = ({ children }) => {
 
     // First priority: Queued songs
     if (queuedSongs.length > 0) {
+      console.log("queuedSongs", queuedSongs);
       return queuedSongs[0];
     }
 
@@ -164,6 +173,22 @@ const AppContextProvider = ({ children }) => {
   const getPreviousSong = () => {
     if (!currentSong || !allSongs) return null;
 
+    // Check if there are songs in the queue
+    if (queuedSongs.length > 0) {
+      // Get the index of the current song in the queue
+      const currentIndex = queuedSongs.findIndex(
+        (song) => song.id === currentSong.id
+      );
+
+      // If the current song is the first in the queue, return the last song in the queue
+      if (currentIndex === 0) {
+        return queuedSongs[queuedSongs.length - 1];
+      }
+
+      // Otherwise, return the previous song in the queue
+      return queuedSongs[currentIndex - 1];
+    }
+
     const currentIndex = allSongs.findIndex(
       (song) => song.id === currentSong.id
     );
@@ -199,9 +224,29 @@ const AppContextProvider = ({ children }) => {
   };
 
   const playNext = async () => {
+    console.log("playNext");
     if (!currentSong || !allSongs || loadingRef.current) return;
 
-    const nextSong = getNextSong();
+    let nextSong;
+
+    if (queuedSongs.length > 0) {
+      // Get the index of the current song in the queue
+      const currentIndex = queuedSongs.findIndex(
+        (song) => song.id === currentSong.id
+      );
+
+      // Determine the next song in the queue
+      if (currentIndex === -1 || currentIndex === queuedSongs.length - 1) {
+        nextSong = queuedSongs[0]; // If current song is not in the queue or is the last song, play the first song in the queue
+      } else {
+        nextSong = queuedSongs[currentIndex + 1]; // Otherwise, play the next song in the queue
+      }
+    } else {
+      // Get the next song in the playlist
+      nextSong = getNextSong();
+    }
+
+    // const nextSong = getNextSong();
     if (!nextSong) return;
 
     // Update shuffle history if in shuffle mode
@@ -210,10 +255,23 @@ const AppContextProvider = ({ children }) => {
       setShuffleQueue((prev) => prev.slice(1));
     }
 
-    // Remove from queue if it was a queued song
-    if (queuedSongs.length > 0) {
-      setQueuedSongs((prev) => prev.slice(1));
-    }
+    // // Remove from queue if it was a queued song
+    // if (queuedSongs.length > 0) {
+    //   setQueuedSongs((prev) => prev.slice(1));
+    // }
+
+    // // Check if there are songs in the queue
+    // if (queuedSongs.length > 0) {
+    //   // Get the next song in the queue
+    //   // Move the song to the end of the queue to simulate a circular queue
+    //   setQueuedSongs((prev) => {
+    //     console.log('prev', prev)
+    //     const updatedQueue = [...prev.slice(1), prev[0]];
+    //     console.log('setItem from setQueuedSongs')
+    //     // localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
+    //     return updatedQueue;
+    //   });
+    // }
 
     await loadAndPlaySong(nextSong);
   };
@@ -318,11 +376,12 @@ const AppContextProvider = ({ children }) => {
   const playQueuedSong = async (song) => {
     if (loadingRef.current) return;
 
-    setQueuedSongs((prev) => {
-      const updatedQueue = prev.filter((s) => s.id !== song.id);
-      localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
-      return updatedQueue;
-    });
+    // setQueuedSongs((prev) => {
+    //   console.log('prev', prev)
+    //   const updatedQueue = prev.filter((s) => s.id !== song.id);
+    //   localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
+    //   return updatedQueue;
+    // });
 
     const success = await loadAndPlaySong(song);
     if (success) {
