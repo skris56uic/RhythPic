@@ -2,3 +2,65 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Common tooltip styles */
+[title] {
+  position: relative;
+}
+
+[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--lightgrey);
+  color: var(--white);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Adjust tooltip position for media controls */
+.mediacontrol-button[title]:hover::after {
+  bottom: -30px;
+}
+
+/* Prevent tooltip from showing on mobile */
+@media (max-width: 768px) {
+  [title]:hover::after {
+    display: none;
+  }
+}
+
+/* Button resets */
+.mediacontrol-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Optional: Add delay to tooltip */
+[title]:hover::after {
+  animation: tooltipDelay 0.2s;
+}
+
+@keyframes tooltipDelay {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

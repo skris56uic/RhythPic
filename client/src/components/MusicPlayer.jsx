@@ -9,19 +9,32 @@ import { base_url, fetchSongLyrics, fetchSongTrivia } from "../api/api";
 import "./MusicPlayer.css";
 import Loader from "./Loader";
 
-export default function MusicPlayer() {
-  const {
-    allSongs,
-    setAllSongs,
-    setCurrentSong,
-    loading,
-    setLoading,
-    audioRef,
-  } = useContext(AppContext);
-  const { songid } = useParams();
+import "./MusicPlayer.css";
 
+export default function MusicPlayer() {
+  const { allSongs, currentSong, loading, loadAndPlaySong } =
+    useContext(AppContext);
+
+  const { songid } = useParams();
   const [sidepanelstate, setsidepanelstate] = useState("closed");
 
+  useEffect(() => {
+    const initializeSong = async () => {
+      if (!allSongs || !songid) return;
+
+      // Only load if it's different from current song
+      if (currentSong?.id !== songid) {
+        const song = allSongs.find((s) => s.id === songid);
+        if (song) {
+          await loadAndPlaySong(song);
+        }
+      }
+    };
+
+    initializeSong();
+  }, [songid, allSongs]); // Remove currentSong from dependencies
+
+  // Panel state handlers...
   function opencloselyricspanel() {
     if (sidepanelstate === "closed") {
       setsidepanelstate("lyrics");

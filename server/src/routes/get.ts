@@ -79,12 +79,12 @@ router.get("/songFact", async (req, res) => {
     // Get song metadata to construct search query
     const metadata = getSongMetadata(songId);
     if (!metadata) {
-      res.status(404).send("Song metadata not found");
+      res.json({ description: "Unable to Fetch any Facts" });
       return;
     }
 
     // Step 1: Search for the song on Genius
-    const searchQuery = `${metadata.name} ${metadata.artist}`.replace(
+    const searchQuery = `${metadata.name} by ${metadata.artist}`.replace(
       /\s+/g,
       "%20"
     );
@@ -101,7 +101,7 @@ router.get("/songFact", async (req, res) => {
     const searchData = await searchResponse.json();
 
     if (!searchData.response.hits.length) {
-      res.status(404).send("Song not found on Genius");
+      res.json({ description: "Unable to Fetch any Facts" });
       return;
     }
 
@@ -123,19 +123,18 @@ router.get("/songFact", async (req, res) => {
 
     const detailsData = await detailsResponse.json();
 
-    if (!detailsData.response.song.description?.plain) {
-      res.status(404).send("No song description found");
-      return;
+    const description = detailsData.response.song.description?.plain || "Unable to Fetch any Facts";
+
+    // Only store in database if we got a real fact
+    if (description !== "Unable to Fetch any Facts") {
+      await SongFactModel.create({
+        songId,
+        geniusId,
+        description,
+      });
     }
 
-    // Store the song fact in database
-    const songFact = await SongFactModel.create({
-      songId,
-      geniusId,
-      description: detailsData.response.song.description.plain,
-    });
-
-    res.json({ description: songFact.description });
+    res.json({ description });
   } catch (error) {
     console.error("Error fetching song fact:", error);
     res.status(500).send("Error fetching song fact");
