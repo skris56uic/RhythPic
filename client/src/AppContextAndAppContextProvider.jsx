@@ -318,13 +318,17 @@ const AppContextProvider = ({ children }) => {
   const playQueuedSong = async (song) => {
     if (loadingRef.current) return;
 
-    setQueuedSongs((prev) => prev.filter((s) => s.id !== song.id));
+    setQueuedSongs((prev) => {
+      const updatedQueue = prev.filter((s) => s.id !== song.id);
+      localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
+      return updatedQueue;
+    });
+
     const success = await loadAndPlaySong(song);
     if (success) {
       setIsPlaying(true);
     }
   };
-
   return (
     <AppContext.Provider
       value={{
