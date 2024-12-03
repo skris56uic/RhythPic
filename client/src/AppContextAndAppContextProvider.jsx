@@ -11,164 +11,71 @@ const AppContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [queuedSongs, setQueuedSongs] = useState(() => {
-    const savedQueue = localStorage.getItem("songQueue");
-    return savedQueue ? JSON.parse(savedQueue) : [];
+    const storedQueue = localStorage.getItem("queuedSongs");
+    return storedQueue ? JSON.parse(storedQueue) : [];
   });
-  const [recentlyPlayed, setRecentlyPlayed] = useState(() => {
-    const saved = localStorage.getItem("recentlyPlayed");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [recentlyPlayed, setRecentlyPlayed] = useState([]);
   const [isShuffle, setIsShuffle] = useState(false);
-  const [repeatMode, setRepeatMode] = useState("none");
-  const [audioState, setAudioState] = useState({
-    source: "",
-    isLoading: false,
-    error: null,
-  });
-
-  const [volume, setVolume] = useState(() => {
-    const savedVolume = localStorage.getItem("volume");
-    return savedVolume ? Number(savedVolume) : 100;
-  });
-
-  const audioRef = useRef();
-
-  useEffect(() => {
-    audioRef.current = new Audio();
-    // Set initial volume from localStorage
-    const savedVolume = localStorage.getItem("volume");
-    audioRef.current.volume = savedVolume ? Number(savedVolume) / 100 : 1;
-
-    return () => {
-      audioRef.current.pause();
-      audioRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume / 100;
-      localStorage.setItem("volume", volume.toString());
-    }
-  }, [volume]);
-
-  useEffect(() => {
-    if (audioState.source) {
-      const loadAudio = async () => {
-        try {
-          audioRef.current.src = audioState.source;
-          await audioRef.current.load();
-          await audioRef.current.play();
-          setIsPlaying(true);
-          setAudioState((prev) => ({ ...prev, isLoading: false }));
-          setLoading(null);
-        } catch (error) {
-          setAudioState((prev) => ({ ...prev, error, isLoading: false }));
-          setIsPlaying(false);
-          setLoading(null);
-        }
-      };
-
-      setAudioState((prev) => ({ ...prev, isLoading: true }));
-      loadAudio();
-    }
-  }, [audioState.source]);
-
-  useEffect(() => {
-    localStorage.setItem("songQueue", JSON.stringify(queuedSongs));
-  }, [queuedSongs]);
-
-  useEffect(() => {
-    try {
-      const essentialData = recentlyPlayed.map((song) => ({
-        id: song.id,
-        name: song.name,
-        artist: song.artist,
-        album_art_url: song.album_art_url,
-        favourite: song.favourite,
-      }));
-      localStorage.setItem("recentlyPlayed", JSON.stringify(essentialData));
-    } catch (error) {
-      console.error("Error saving to localStorage:", error);
-    }
-  }, [recentlyPlayed]);
+  const [repeatMode, setRepeatMode] = useState("none"); // none, one, all
+  const [volume, setVolume] = useState(50);
+  const [shuffleHistory, setShuffleHistory] = useState([]);
+  const [shuffleQueue, setShuffleQueue] = useState([]);
+  const audioRef = useRef(new Audio());
+  const loadingRef = useRef(false);
 
   const addToRecentlyPlayed = (song) => {
-    if (!song) return;
     setRecentlyPlayed((prev) => {
-      const minimalSong = {
-        id: song.id,
-        name: song.name,
-        artist: song.artist,
-        album_art_url: song.album_art_url,
-        favourite: song.favourite,
-      };
       const filtered = prev.filter((s) => s.id !== song.id);
-      const updated = [minimalSong, ...filtered].slice(0, 5);
-      return updated;
+      return [song, ...filtered].slice(0, 10);
     });
   };
 
   const addToQueue = (song) => {
-    if (!queuedSongs.some((queuedSong) => queuedSong.id === song.id)) {
-      setQueuedSongs([...queuedSongs, song]);
-    }
+    setQueuedSongs((prev) => {
+      console.log("setQueuedSongs", prev);
+      const isSongInQueue = prev.some(
+        (queuedSong) => queuedSong.id === song.id
+      );
+      if (isSongInQueue) {
+        return prev; // If the song is already in the queue, return the previous state
+      }
+      const updatedQueue = [...prev, song];
+      console.log("setItem from addToQueue");
+      localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
+      return updatedQueue;
+    });
   };
 
   const removeFromQueue = (songId) => {
-    setQueuedSongs(queuedSongs.filter((song) => song.id !== songId));
+    console.log("removeFromQueue");
+    setQueuedSongs((prev) => {
+      const updatedQueue = prev.filter((song) => song.id !== songId);
+      console.log("setItem from removeFromQueue");
+      localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
+      return updatedQueue;
+    });
   };
 
-  const clearQueue = () => {
-    setQueuedSongs([]);
-  };
+  const loadAndPlaySong = async (song) => {
+    if (!song || loadingRef.current) return false;
 
-  const togglePlayPause = () => {
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const toggleShuffle = () => {
-    setIsShuffle(!isShuffle);
-  };
-
-  const toggleMute = () => {
-    setVolume((prev) => (prev === 0 ? 100 : 0));
-  };
-
-  const getRandomSong = () => {
-    if (allSongs) {
-      const randomIndex = Math.floor(Math.random() * allSongs.length);
-      return allSongs[randomIndex];
-    }
-    return null;
-  };
-
-  const toggleRepeat = () => {
-    const modes = ["none", "one", "all"];
-    const currentIndex = modes.indexOf(repeatMode);
-    setRepeatMode(modes[(currentIndex + 1) % modes.length]);
-  };
-
-  const playSong = async (song) => {
     try {
+      loadingRef.current = true;
       setLoading({ text: "Loading Song..." });
 
-      // Stop current playback
+      // Reset current audio
       audioRef.current.pause();
+      audioRef.current.currentTime = 0;
       audioRef.current.src = "";
       setIsPlaying(false);
 
       // Load song details if needed
+      let songToPlay = song;
       if (!song.lyricsAndImages) {
         const lyrics = await fetchSongLyrics(song.id);
         const trivia = await fetchSongTrivia(lyrics.fileName);
 
-        const updatedSong = {
+        songToPlay = {
           ...song,
           fileName: lyrics.fileName,
           lyricsAndImages: lyrics.isong.lines,
@@ -176,156 +83,309 @@ const AppContextProvider = ({ children }) => {
         };
 
         setAllSongs((prev) =>
-          prev.map((s) => (s.id === song.id ? updatedSong : s))
+          prev.map((s) => (s.id === song.id ? songToPlay : s))
         );
-        song = updatedSong;
       }
 
-      // Set audio source first
-      audioRef.current.src = `${base_url}/audio?id=${song.id}`;
+      // Update current song before loading audio
+      setCurrentSong(songToPlay);
+      addToRecentlyPlayed(songToPlay);
+
+      // Load and play audio
+      audioRef.current.src = `${base_url}/audio?id=${songToPlay.id}`;
 
       // Wait for audio to be loaded
       await new Promise((resolve, reject) => {
-        audioRef.current.onloadeddata = () => {
+        const handleCanPlay = () => {
+          audioRef.current.removeEventListener("canplay", handleCanPlay);
+          audioRef.current.removeEventListener("error", handleError);
           resolve();
         };
-        audioRef.current.onerror = (e) => {
-          console.error("Audio load error:", e);
-          reject(e);
+
+        const handleError = (error) => {
+          audioRef.current.removeEventListener("canplay", handleCanPlay);
+          audioRef.current.removeEventListener("error", handleError);
+          reject(error);
         };
+
+        audioRef.current.addEventListener("canplay", handleCanPlay);
+        audioRef.current.addEventListener("error", handleError);
         audioRef.current.load();
       });
 
-      // Update states after audio is loaded
-      setCurrentSong(song);
-      addToRecentlyPlayed(song);
-
-      // Play the audio
       await audioRef.current.play();
       setIsPlaying(true);
-
-      setLoading(null);
       return true;
     } catch (error) {
-      console.error("Error in playSong:", error);
-      setLoading(null);
+      console.error("Error loading song:", error);
       return false;
+    } finally {
+      setLoading(null);
+      loadingRef.current = false;
     }
+  };
+
+  const getNextSong = () => {
+    if (!currentSong || !allSongs) return null;
+
+    // First priority: Queued songs
+    if (queuedSongs.length > 0) {
+      console.log("queuedSongs", queuedSongs);
+      return queuedSongs[0];
+    }
+
+    const currentIndex = allSongs.findIndex(
+      (song) => song.id === currentSong.id
+    );
+
+    // Handle shuffle mode
+    if (isShuffle) {
+      // If shuffle queue is empty, generate new shuffled queue excluding current song
+      if (shuffleQueue.length === 0) {
+        const availableSongs = allSongs.filter(
+          (song) => song.id !== currentSong.id
+        );
+        const newShuffleQueue = [...availableSongs].sort(
+          () => Math.random() - 0.5
+        );
+        setShuffleQueue(newShuffleQueue);
+        setShuffleHistory([currentSong]);
+        return newShuffleQueue[0];
+      }
+      return shuffleQueue[0];
+    }
+
+    // Handle repeat modes
+    if (currentIndex === allSongs.length - 1) {
+      // If at end of playlist
+      if (repeatMode !== "none") {
+        return currentSong; // Repeat current song
+      }
+      return null; // Stop playing
+    }
+
+    // Normal next song
+    return allSongs[currentIndex + 1];
+  };
+
+  const getPreviousSong = () => {
+    if (!currentSong || !allSongs) return null;
+
+    // Check if there are songs in the queue
+    if (queuedSongs.length > 0) {
+      // Get the index of the current song in the queue
+      const currentIndex = queuedSongs.findIndex(
+        (song) => song.id === currentSong.id
+      );
+
+      // If the current song is the first in the queue, return the last song in the queue
+      if (currentIndex === 0) {
+        return queuedSongs[queuedSongs.length - 1];
+      }
+
+      // Otherwise, return the previous song in the queue
+      return queuedSongs[currentIndex - 1];
+    }
+
+    const currentIndex = allSongs.findIndex(
+      (song) => song.id === currentSong.id
+    );
+
+    // Handle shuffle mode
+    if (isShuffle) {
+      if (shuffleHistory.length > 1) {
+        const previousSong = shuffleHistory[shuffleHistory.length - 2];
+        setShuffleHistory((prev) => prev.slice(0, -1));
+        setShuffleQueue((prev) => [currentSong, ...prev]);
+        return previousSong;
+      }
+      // If no history, get random song
+      const availableSongs = allSongs.filter(
+        (song) => song.id !== currentSong.id
+      );
+      return availableSongs[Math.floor(Math.random() * availableSongs.length)];
+    }
+
+    // Handle repeat modes
+    if (currentIndex === 0) {
+      // If at start of playlist
+      if (repeatMode === "all") {
+        return allSongs[allSongs.length - 1]; // Go to end
+      } else if (repeatMode === "one") {
+        return currentSong; // Repeat current song
+      }
+      return null; // Stay on first song
+    }
+
+    // Normal previous song
+    return allSongs[currentIndex - 1];
   };
 
   const playNext = async () => {
-    try {
-      // If repeat one is enabled, replay current song
-      if (repeatMode === "one") {
-        await playSong(currentSong, false);
-        return;
-      }
+    console.log("playNext");
+    if (!currentSong || !allSongs || loadingRef.current) return;
 
-      if (isShuffle) {
-        const randomSong = getRandomSong();
-        if (randomSong) {
-          await playSong(randomSong);
-        }
-        return;
-      }
+    let nextSong;
 
-      // Check if current song is in queue
-      const currentQueueIndex = queuedSongs.findIndex(
-        (s) => s.id === currentSong?.id
+    if (queuedSongs.length > 0) {
+      // Get the index of the current song in the queue
+      const currentIndex = queuedSongs.findIndex(
+        (song) => song.id === currentSong.id
       );
 
-      if (queuedSongs.length > 0) {
-        let nextSong;
-        let newQueue;
-
-        if (currentQueueIndex === -1) {
-          // Current song not in queue, play first queued song
-          nextSong = queuedSongs[0];
-          newQueue = queuedSongs.slice(1);
-        } else if (currentQueueIndex + 1 < queuedSongs.length) {
-          // Play next song in queue
-          nextSong = queuedSongs[currentQueueIndex + 1];
-          newQueue = queuedSongs.slice(currentQueueIndex + 1);
-        } else {
-          // End of queue reached, find current song in all songs and play next
-          const currentAllSongsIndex = allSongs.findIndex(
-            (s) => s.id === currentSong.id
-          );
-          const nextIndex = (currentAllSongsIndex + 1) % allSongs.length;
-          nextSong = allSongs[nextIndex];
-          newQueue = [];
-        }
-
-        const success = await playSong(nextSong, true);
-        if (success) {
-          setQueuedSongs(newQueue);
-        }
+      // Determine the next song in the queue
+      if (currentIndex === -1 || currentIndex === queuedSongs.length - 1) {
+        nextSong = queuedSongs[0]; // If current song is not in the queue or is the last song, play the first song in the queue
       } else {
-        // No queue, play from all songs
-        const currentIndex = allSongs.findIndex((s) => s.id === currentSong.id);
-        if (currentIndex > -1) {
-          // Always go to next song, wrapping around to beginning if at end
-          const nextIndex = (currentIndex + 1) % allSongs.length;
-          await playSong(allSongs[nextIndex], false);
-        }
+        nextSong = queuedSongs[currentIndex + 1]; // Otherwise, play the next song in the queue
       }
-    } catch (error) {
-      console.error("Error in playNext:", error);
-      setLoading(null);
+    } else {
+      // Get the next song in the playlist
+      nextSong = getNextSong();
     }
+
+    // const nextSong = getNextSong();
+    if (!nextSong) return;
+
+    // Update shuffle history if in shuffle mode
+    if (isShuffle) {
+      setShuffleHistory((prev) => [...prev, nextSong]);
+      setShuffleQueue((prev) => prev.slice(1));
+    }
+
+    // // Remove from queue if it was a queued song
+    // if (queuedSongs.length > 0) {
+    //   setQueuedSongs((prev) => prev.slice(1));
+    // }
+
+    // // Check if there are songs in the queue
+    // if (queuedSongs.length > 0) {
+    //   // Get the next song in the queue
+    //   // Move the song to the end of the queue to simulate a circular queue
+    //   setQueuedSongs((prev) => {
+    //     console.log('prev', prev)
+    //     const updatedQueue = [...prev.slice(1), prev[0]];
+    //     console.log('setItem from setQueuedSongs')
+    //     // localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
+    //     return updatedQueue;
+    //   });
+    // }
+
+    await loadAndPlaySong(nextSong);
   };
 
   const playPrevious = async () => {
+    if (!currentSong || !allSongs || loadingRef.current) return;
+
+    const prevSong = getPreviousSong();
+    if (!prevSong) return;
+
+    await loadAndPlaySong(prevSong);
+  };
+
+  const togglePlayPause = async () => {
+    if (loadingRef.current) return;
+
     try {
-      // Check if current song is in queue
-      const currentQueueIndex = queuedSongs.findIndex(
-        (s) => s.id === currentSong?.id
-      );
-
-      if (currentQueueIndex !== -1 || queuedSongs.length > 0) {
-        // If song is in queue or queue exists, just restart current song
-        audioRef.current.currentTime = 0;
-        if (!isPlaying) {
-          await audioRef.current.play();
-          setIsPlaying(true);
-        }
-        return;
-      }
-
-      // If not in queue, handle navigation through all songs list
-      const currentIndex = allSongs.findIndex((s) => s.id === currentSong.id);
-      if (currentIndex > -1) {
-        // If it's the first song, go to the last song
-        const prevIndex =
-          currentIndex === 0 ? allSongs.length - 1 : currentIndex - 1;
-        await playSong(allSongs[prevIndex], false);
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        await audioRef.current.play();
+        setIsPlaying(true);
       }
     } catch (error) {
-      console.error("Error in playPrevious:", error);
-      setLoading(null);
+      console.error("Error toggling play/pause:", error);
+      setIsPlaying(false);
+    }
+  };
+
+  const toggleShuffle = () => {
+    setIsShuffle((prev) => {
+      const newValue = !prev;
+      if (newValue) {
+        // Starting shuffle mode
+        setShuffleHistory([currentSong]);
+        const availableSongs = allSongs.filter(
+          (song) => song.id !== currentSong.id
+        );
+        setShuffleQueue([...availableSongs].sort(() => Math.random() - 0.5));
+      } else {
+        // Ending shuffle mode
+        setShuffleHistory([]);
+        setShuffleQueue([]);
+      }
+      return newValue;
+    });
+  };
+
+  const toggleRepeat = () => {
+    setRepeatMode((current) => {
+      switch (current) {
+        case "none":
+          return "one";
+        case "one":
+          return "all";
+        case "all":
+          return "none";
+        default:
+          return "none";
+      }
+    });
+  };
+
+  const toggleMute = () => {
+    if (volume === 0) {
+      setVolume(50);
+      audioRef.current.volume = 0.5;
+    } else {
+      setVolume(0);
+      audioRef.current.volume = 0;
     }
   };
 
   useEffect(() => {
-    if (audioRef.current) {
-      const handleSongEnd = async () => {
-        if (repeatMode === "one") {
-          audioRef.current.currentTime = 0;
-          await audioRef.current.play();
-        } else {
-          await playNext();
-        }
-      };
+    const handleSongEnd = async () => {
+      if (repeatMode === "one") {
+        audioRef.current.currentTime = 0;
+        await audioRef.current.play();
+      } else {
+        await playNext();
+      }
+    };
 
-      audioRef.current.addEventListener("ended", handleSongEnd);
-      return () => {
-        if (audioRef.current) {
-          audioRef.current.removeEventListener("ended", handleSongEnd);
-        }
-      };
+    audioRef.current.addEventListener("ended", handleSongEnd);
+    return () => audioRef.current.removeEventListener("ended", handleSongEnd);
+  }, [repeatMode]);
+
+  useEffect(() => {
+    audioRef.current.volume = volume / 100;
+  }, [volume]);
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+      }
+    };
+  }, []);
+
+  const playQueuedSong = async (song) => {
+    if (loadingRef.current) return;
+
+    // setQueuedSongs((prev) => {
+    //   console.log('prev', prev)
+    //   const updatedQueue = prev.filter((s) => s.id !== song.id);
+    //   localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
+    //   return updatedQueue;
+    // });
+
+    const success = await loadAndPlaySong(song);
+    if (success) {
+      setIsPlaying(true);
     }
-  }, [repeatMode, currentSong]);
-
+  };
   return (
     <AppContext.Provider
       value={{
@@ -339,24 +399,25 @@ const AppContextProvider = ({ children }) => {
         setLoading,
         isPlaying,
         setIsPlaying,
-        audioRef,
-        togglePlayPause,
+        isShuffle,
+        toggleShuffle,
+        repeatMode,
+        toggleRepeat,
         queuedSongs,
+        setQueuedSongs,
         addToQueue,
         removeFromQueue,
-        clearQueue,
-        playQueuedSong: playSong,
+        playQueuedSong,
         recentlyPlayed,
-        addToRecentlyPlayed,
-        playNext,
-        playPrevious,
-        toggleShuffle,
-        isShuffle,
-        toggleRepeat,
-        repeatMode,
         volume,
         setVolume,
         toggleMute,
+        audioRef,
+        togglePlayPause,
+        playNext,
+        playPrevious,
+        loadAndPlaySong,
+        addToRecentlyPlayed,
       }}
     >
       {children}

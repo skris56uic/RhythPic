@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState, useContext } from "react";
 
 import { AppContext } from "../AppContextAndAppContextProvider";
@@ -21,12 +22,14 @@ export default function MainPanel({
   };
 
   useEffect(() => {
-    if (currentSong) {
+    if (currentSong?.lyricsAndImages) {
       const imagesWithIndex = currentSong.lyricsAndImages
         .map((line, index) => ({ ...line, index }))
         .filter((line) => line.image_base && line.image_base !== "");
 
       setLoadedImages(imagesWithIndex);
+    } else {
+      setLoadedImages([]);
     }
   }, [currentSong]);
 

@@ -13,15 +13,17 @@ export default function Dashboard() {
     setAllSongs,
     currentSong,
     loading,
-    queuedSongs,
+    queuedSongs = [], // Provide default empty array
     addToQueue,
     removeFromQueue,
     playQueuedSong,
-    recentlyPlayed,
+    recentlyPlayed = [], // Provide default empty array
     setIsPlaying,
   } = useContext(AppContext);
 
   function handleFavouriteClick(songId) {
+    if (!allSongs) return;
+
     const updatedSongs = allSongs.map((song) => {
       if (song.id === songId) {
         return { ...song, favourite: !song.favourite };
@@ -49,7 +51,6 @@ export default function Dashboard() {
 
   async function handleQueueItemClick(song) {
     await playQueuedSong(song);
-    setIsPlaying(false);
     navigate(`/musicplayer/${song.id}`);
   }
 
@@ -59,6 +60,8 @@ export default function Dashboard() {
   }
 
   function generateSongTiles(songs) {
+    if (!songs || !songs.length) return null;
+
     return songs.map((song) => (
       <Link to={`/musicplayer/${song.id}`} key={song.id} className="songtile">
         <img
@@ -130,6 +133,11 @@ export default function Dashboard() {
   }
 
   function generateQueueListItems() {
+    // Ensure queuedSongs exists and has length property
+    if (!queuedSongs || !queuedSongs.length) {
+      return <div className="no-songs">No songs in queue</div>;
+    }
+
     return queuedSongs.map((song) => (
       <div
         className="queueListitem"
@@ -170,42 +178,34 @@ export default function Dashboard() {
   return loading ? (
     <Loader />
   ) : (
-    <>
-      {allSongs && (
-        <div
-          className="dashboard"
-          style={{
-            height: `${
-              currentSong
-                ? "calc(100vh - (var(--footerheight) + var(--navbarheight)))"
-                : "calc(100vh - (var(--navbarheight)))"
-            }`,
-          }}
-        >
-          <div className="playlists">
-            <h2>Recently Played</h2>
-            <div className="songlist">
-              {recentlyPlayed.length > 0 ? (
-                generateSongTiles(recentlyPlayed)
-              ) : (
-                <div>No recently played songs</div>
-              )}
-            </div>
-            <h2>All Songs</h2>
-            <div className="songlist">
-              {allSongs.length && generateSongTiles(allSongs)}
-            </div>
-          </div>
-          <div className="queuedsongs">
-            <h2 className="title">Queued Songs</h2>
-            {queuedSongs.length ? (
-              generateQueueListItems()
-            ) : (
-              <div className="no-songs">No songs in queue</div>
-            )}
-          </div>
+    <div
+      className="dashboard"
+      style={{
+        height: `${
+          currentSong
+            ? "calc(100vh - (var(--footerheight) + var(--navbarheight)))"
+            : "calc(100vh - (var(--navbarheight)))"
+        }`,
+      }}
+    >
+      <div className="playlists">
+        <h2>Recently Played</h2>
+        <div className="songlist">
+          {recentlyPlayed?.length > 0 ? (
+            generateSongTiles(recentlyPlayed)
+          ) : (
+            <div>No recently played songs</div>
+          )}
         </div>
-      )}
-    </>
+        <h2>All Songs</h2>
+        <div className="songlist">
+          {allSongs?.length > 0 ? generateSongTiles(allSongs) : null}
+        </div>
+      </div>
+      <div className="queuedsongs">
+        <h2 className="title">Queued Songs</h2>
+        {generateQueueListItems()}
+      </div>
+    </div>
   );
 }
