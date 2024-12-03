@@ -10,7 +10,10 @@ const AppContextProvider = ({ children }) => {
   const [songProgress, setSongProgress] = useState(0);
   const [loading, setLoading] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [queuedSongs, setQueuedSongs] = useState([]);
+  const [queuedSongs, setQueuedSongs] = useState(() => {
+    const storedQueue = localStorage.getItem("queuedSongs");
+    return storedQueue ? JSON.parse(storedQueue) : [];
+  });
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState("none"); // none, one, all
@@ -29,15 +32,20 @@ const AppContextProvider = ({ children }) => {
 
   const addToQueue = (song) => {
     setQueuedSongs((prev) => {
-      if (prev.some((queuedSong) => queuedSong.id === song.id)) {
-        return prev;
-      }
-      return [...prev, song];
+      const updatedQueue = prev.some((queuedSong) => queuedSong.id === song.id)
+        ? prev
+        : [...prev, song];
+      localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
+      return updatedQueue;
     });
   };
 
   const removeFromQueue = (songId) => {
-    setQueuedSongs((prev) => prev.filter((song) => song.id !== songId));
+    setQueuedSongs((prev) => {
+      const updatedQueue = prev.filter((song) => song.id !== songId);
+      localStorage.setItem("queuedSongs", JSON.stringify(updatedQueue));
+      return updatedQueue;
+    });
   };
 
   const loadAndPlaySong = async (song) => {
