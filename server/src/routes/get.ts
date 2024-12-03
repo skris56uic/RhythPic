@@ -126,7 +126,7 @@ router.get("/songFact", async (req, res) => {
       detailsData.response.song.description?.plain ||
       "Unable to Fetch any Facts";
     // Only store in database if we got a real fact
-    if (description !== "Unable to Fetch any Facts") {
+    if (description !== "Unable to Fetch any Facts" && description.length > 2) {
       await SongFactModel.create({
         songId,
         geniusId,
