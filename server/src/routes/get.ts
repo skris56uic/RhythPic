@@ -134,9 +134,10 @@ router.get("/songFact", async (req, res) => {
       });
     }
 
+
     res.json({
       description:
-        description.length > 1 ? description : "Unable to Fetch any Facts",
+        description.length > 2 ? description : "Unable to Fetch any Facts",
     });
   } catch (error) {
     console.error("Error fetching song fact:", error);
