@@ -1,4 +1,4 @@
-export const base_url = "https://rhythpic.onrender.com";
+export const base_url = "https://rhythpic-backend.onrender.com";
 
 export async function fetchSongLyrics(songId) {
   try {
